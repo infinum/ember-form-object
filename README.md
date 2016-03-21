@@ -1,4 +1,4 @@
-# Ember-cli-form-object
+# Ember Form Object
 
 This README outlines the details of collaborating on this Ember addon.
 

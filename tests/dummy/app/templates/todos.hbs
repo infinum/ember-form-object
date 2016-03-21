@@ -1,0 +1,21 @@
+<h3> Model Form Object example </h3>
+
+<hr/>
+
+<table>
+<tr>
+<td>
+  <h3> TODOs </h3>
+  <ul>
+    {{#each todos as |todo|}}
+      <li>
+        {{#link-to 'todos.edit' todo}}
+          {{todo.title}} ({{todo.assignee.name}})
+        {{/link-to}}
+      </li>
+    {{/each}}
+  </ul>
+</td>
+<td> {{outlet}} </td>
+</tr>
+</table>

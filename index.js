@@ -2,5 +2,5 @@
 'use strict';
 
 module.exports = {
-  name: 'ember-cli-form-object'
+  name: 'ember-form-object'
 };

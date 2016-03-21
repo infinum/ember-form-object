@@ -1,0 +1,100 @@
+<table>
+<tr>
+<td>
+
+<h3> Form </h3>
+
+<table>
+  <tr>
+    <th> Title </th>
+    <td> {{input value=modelForm.title type='text'}} </td>
+  </tr>
+
+  <tr>
+    <th> Description </th>
+    <td> {{textarea value=modelForm.description}} </td>
+  </tr>
+
+  <tr>
+    <th> Assignee </th>
+    <td>
+      {{select-field value=modelForm.assignee options=modelForm.people}}
+    </td>
+  </tr>
+
+  <tr>
+    <th> Completed </th>
+    <td> {{checkbox-field value=modelForm.completed}} </td>
+  </tr>
+
+  <tr>
+    <th> Subscribers </th>
+    <td> {{#each modelForm.subscribers as |user|}} {{user.name}}, {{/each}} </td>
+  </tr>
+
+  <tr> <td> <hr/> </td> <td> <hr/> </td> </tr>
+
+  <tr> <th> isLoaded </th> <td> {{modelForm.isLoaded}} </td> </tr>
+  <tr> <th> isDirty </th> <td> {{modelForm.isDirty}} </td> </tr>
+  <tr> <th> isSubmiting </th> <td> {{modelForm.isSubmiting}} </td> </tr>
+
+  <tr>
+    <th> </th>
+    <td> <button type="submit" {{action 'saveModelForm'}}> Submit </button> </td>
+  </tr>
+</table>
+
+</td>
+
+<td>
+  <h3> Model properties </h3>
+    <tr>
+      <th> Title </th>
+      <td> {{model.title}} </td>
+    </tr>
+    <tr>
+      <th> Description </th>
+      <td> {{model.description}} </td>
+    </tr>
+    <tr>
+      <th> Assignee </th>
+      <td> {{model.assignee.name}} </td>
+    </tr>
+    <tr>
+      <th> Completed </th>
+      <td> {{model.completed}} </td>
+    </tr>
+    <tr>
+      <th> Subscribers </th>
+      <td> {{#each model.subscribers as |user|}} {{user.name}}, {{/each}} </td>
+    </tr>
+  <hr/>
+
+  <h3> Form object properties </h3>
+
+  <table>
+    <tr>
+      <th> Title </th>
+      <td> {{modelForm.title}} </td>
+    </tr>
+    <tr>
+      <th> Description </th>
+      <td> {{modelForm.description}} </td>
+    </tr>
+    <tr>
+      <th> Assignee </th>
+      <td> {{modelForm.assignee.name}} </td>
+    </tr>
+    <tr>
+      <th> Completed </th>
+      <td> {{modelForm.completed}} </td>
+    </tr>
+    <tr>
+      <th> Subscribers </th>
+      <td> {{#each modelForm.subscribers as |user|}} {{user.name}}, {{/each}} </td>
+    </tr>
+  </table>
+</td>
+
+</tr>
+</table>
