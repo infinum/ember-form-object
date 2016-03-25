@@ -11,10 +11,17 @@ Form object pattern in Ember apps (similar to ActiveModel Form Objects in Ruby o
 * Well defined form save (submit) process with appropriate hooks
 * Manage form "dirty", "loaded" and "submiting" state
 * Prevent form loss with confirmation when leaving dirty form
+* Add/remove properties in runtime (useful for dynamic forms)
+
+## Installation
+
+```javascript
+ember install ember-form-object
+```
 
 ## Example usage
 
-##### Example form object for todo model
+##### Form object for todo model
 ```javascript
 // app/forms/todo.js
 
@@ -52,10 +59,36 @@ export default ModelFormObject.extend({
 });
 ```
 
-##### Example login form
+##### Route with form route mixin (which instantiates todo form object)
 ```javascript
 import Ember from 'ember';
-import BaseForm from 'ember-form-object/base-form';
+import FormRouteMixin from 'ember-form-object/mixins/form-route';
+import TodoForm from '../../forms/todo';
+
+export default Ember.Route.extend(FormRouteMixin, {
+  formClass: TodoForm,
+
+  model(params) {
+    return this.store.peekRecord('todo', params.id);
+  },
+
+  afterModel() {
+    this._super(...arguments);
+    this.set('modelForm.people', this.store.peekAll('user'));
+  },
+
+  actions: {
+    saveModelForm() {
+      this.get('modelForm').save();
+    }
+  }
+});
+```
+
+##### Non-model form object usage (login form)
+```javascript
+import Ember from 'ember';
+import BaseForm from 'ember-form-object/forms/base-form';
 
 export default BaseForm.extend({
   properties: {
@@ -87,15 +120,16 @@ This project is currently in **alpha** state. Public API of the library is still
 
 ## Development
 
-### TODOs
+### TODOs (by priority)
+* Example page & docs
 * Use ember dependency injection to load form classes
 * Remove lodash dependency
 * Get rid of "container" deprecation warning when instantiating form object
+* Better test coverage
 * Remove form-loss feature from route mixin and just add it as an example
 * Add blueprints for ember-cli
-* Better test coverage
 
-### Installation
+### Setup development environment
 
 * `git clone` this repository
 * `npm install`
