@@ -1,7 +1,7 @@
 {
   "name": "ember-form-object",
-  "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
+  "version": "0.0.1",
+  "description": "Form object pattern for ember apps",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -11,40 +11,46 @@
     "start": "ember server",
     "test": "ember try:testall"
   },
-  "repository": "",
+  "repository": "https://github.com/infinum/ember-form-object.git",
   "engines": {
     "node": ">= 0.10.0"
   },
-  "author": "",
+  "author": "Ivan Lučin <ivan.lucin@infinum.hr>",
+  "contributors": [{
+    "name": "Jan Varljen",
+    "email": "jan.varljen@infinum.hr"
+  }],
   "license": "MIT",
   "devDependencies": {
-    "broccoli-asset-rev": "2.4.2",
+    "broccoli-asset-rev": "^2.2.0",
     "ember-ajax": "2.0.0-beta.3",
     "ember-cli": "2.4.2",
-    "ember-cli-app-version": "1.0.0",
-    "ember-cli-dependency-checker": "1.2.0",
-    "ember-cli-htmlbars": "1.0.3",
-    "ember-cli-htmlbars-inline-precompile": "0.3.1",
-    "ember-cli-inject-live-reload": "1.4.0",
-    "ember-cli-qunit": "1.4.0",
+    "ember-cli-app-version": "^1.0.0",
+    "ember-cli-dependency-checker": "^1.2.0",
+    "ember-cli-htmlbars": "^1.0.1",
+    "ember-cli-htmlbars-inline-precompile": "^0.3.1",
+    "ember-cli-inject-live-reload": "^1.3.1",
+    "ember-cli-qunit": "^1.2.1",
     "ember-cli-release": "1.0.0-beta.1",
-    "ember-cli-sri": "2.1.0",
-    "ember-cli-uglify": "1.2.0",
-    "ember-data": "2.4.2",
-    "ember-disable-prototype-extensions": "1.1.0",
-    "ember-disable-proxy-controllers": "1.0.1",
-    "ember-export-application-global": "1.0.5",
-    "ember-load-initializers": "0.5.1",
-    "ember-lodash": "0.0.6",
-    "ember-resolver": "2.0.3",
-    "ember-try": "0.1.3",
-    "ember-validations": "2.0.0-alpha.4",
-    "loader.js": "4.0.1"
+    "ember-cli-sri": "^2.1.0",
+    "ember-cli-uglify": "^1.2.0",
+    "ember-data": "^2.4.0",
+    "ember-disable-prototype-extensions": "^1.1.0",
+    "ember-disable-proxy-controllers": "^1.0.1",
+    "ember-export-application-global": "^1.0.4",
+    "ember-load-initializers": "^0.5.0",
+    "ember-lodash": "^0.0.6",
+    "ember-resolver": "^2.0.3",
+    "ember-try": "^0.1.2",
+    "loader.js": "^4.0.0"
   },
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "ember-validations",
+    "form object"
   ],
   "dependencies": {
+    "ember-validations": "2.0.0-alpha.4",
     "ember-cli-babel": "^5.1.5"
   },
   "ember-addon": {

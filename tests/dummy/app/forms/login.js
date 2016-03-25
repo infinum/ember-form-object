@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import BaseForm from 'ember-form-obejct/base-form';
+import BaseForm from 'ember-form-object/base-form';
 
 export default BaseForm.extend({
   properties: {
