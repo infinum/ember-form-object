@@ -2,10 +2,19 @@ import _ from 'lodash';
 import Ember from 'ember';
 import { isThenable } from 'ember-form-object/utils/core';
 
+function getEmberValidationsContainerPolyfill(owner) {
+  return {
+    lookup: module => owner.lookup(module),
+    lookupFactory: module => owner._lookupFactory ? owner._lookupFactory(module) : owner.lookupFactory(module)
+  };
+}
+
 export default Ember.Mixin.create({
-  init(container, extraProps) {
-    Ember.assert('Form object should be instantiated with a container', !!container && 'registry' in container);
-    this.container = container;
+  init(owner, extraProps) {
+    Ember.assert('Form object should be instantiated with an owner object', !!owner && 'lookup' in owner);
+
+    // ember-validations is still performing module lookup on this.controller so we have to fake it
+    this.container = getEmberValidationsContainerPolyfill(owner);
 
     this.validations = _.cloneDeep(this.validations || {});
     this.properties = _.cloneDeep(this.properties || {});

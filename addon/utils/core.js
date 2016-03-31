@@ -1,8 +1,9 @@
 import Ember from 'ember';
 import DS from 'ember-data';
+import getOwner from 'ember-getowner-polyfill'
 
 function createFormObject(hostObject, FormClass, arg1, arg2) {
-  return new FormClass(hostObject.get('container'), arg1, arg2);
+  return new FormClass(getOwner(hostObject), arg1, arg2);
 }
 
 function isEmberPromise(obj) {

@@ -16,10 +16,12 @@
     "node": ">= 0.10.0"
   },
   "author": "Ivan Lučin <ivan.lucin@infinum.hr>",
-  "contributors": [{
-    "name": "Jan Varljen",
-    "email": "jan.varljen@infinum.hr"
-  }],
+  "contributors": [
+    {
+      "name": "Jan Varljen",
+      "email": "jan.varljen@infinum.hr"
+    }
+  ],
   "license": "MIT",
   "devDependencies": {
     "broccoli-asset-rev": "^2.2.0",
@@ -50,8 +52,9 @@
     "form object"
   ],
   "dependencies": {
-    "ember-validations": "2.0.0-alpha.4",
-    "ember-cli-babel": "^5.1.5"
+    "ember-cli-babel": "^5.1.5",
+    "ember-getowner-polyfill": "1.0.1",
+    "ember-validations": "2.0.0-alpha.4"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
