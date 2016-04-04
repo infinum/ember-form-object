@@ -1,6 +1,16 @@
 import _ from 'lodash';
 import Ember from 'ember';
-import { isThenable } from 'ember-form-object/utils/core';
+import { isThenable, depromisifyProperty } from 'ember-form-object/utils/core';
+
+function normalizeValueForDirtyComparison(val) {
+  let normalizedVal = depromisifyProperty(val);
+
+  if (normalizedVal === null) {
+    normalizedVal = undefined;
+  }
+
+  return normalizedVal;
+}
 
 function getEmberValidationsContainerPolyfill(owner) {
   return {
@@ -194,8 +204,7 @@ export default Ember.Mixin.create({
   },
 
   _getInitialPropertyValue(propertyName) {
-    const prop = this.properties[propertyName];
-    return prop.initialValue;
+    return this.properties[propertyName].initialValue;
   },
 
   _formPropertyDidChange(obj, propertyName) {
@@ -211,12 +220,20 @@ export default Ember.Mixin.create({
     } else if (!prop.state.isLoaded) {
       this.setPropertyState(propertyName, 'isLoaded', true);
     } else {
-      this.setPropertyState(propertyName, 'isDirty', this._shouldBecomeDirty(propertyName));
+      this.setPropertyState(propertyName, 'isDirty', this._shouldPropertyBecomeDirty(propertyName));
     }
   },
 
-  _shouldBecomeDirty(propertyName) {
-    return !_.isEqual(this.get(propertyName), this._getInitialPropertyValue(propertyName));
+  _shouldPropertyBecomeDirty(propertyName) {
+    const value = this.get(propertyName);
+    const initialValue = this._getInitialPropertyValue(propertyName);
+    const normalizedValue = normalizeValueForDirtyComparison(value);
+    const normalizedInitialValue = normalizeValueForDirtyComparison(initialValue);
+
+    Ember.Logger.debug('ember-form-object: Comparing', value, ' and ', initialValue);
+    Ember.Logger.debug('ember-form-object: Normalized', normalizedValue, ' and ', normalizedInitialValue);
+
+    return !_.isEqual(normalizedValue, normalizedInitialValue);
   },
 
   _isDirty(lastFlag) {

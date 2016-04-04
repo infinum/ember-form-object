@@ -153,11 +153,8 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   _getInitialPropertyValue(propertyName) {
-    const prop = this.properties[propertyName];
-    if (prop.model) {
-      return depromisifyObject(this.get(`model.${propertyName}`));
-    }
-    return this._super(...arguments);
+    const property = this.properties[propertyName];
+    return property.model ? this.get(`model.${propertyName}`) : this._super(...arguments);
   },
 
   _getModelPropertiesHash() {
