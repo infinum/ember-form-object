@@ -104,7 +104,7 @@ export default Ember.Mixin.create({
 
   setPropertyState(propertyName, stateName, flag) {
     this.set(`properties.${propertyName}.state.${stateName}`, !!flag);
-    this.set(stateName, flag ? this[`_${stateName}`]() : false);
+    this.set(stateName, this[`_${stateName}`](flag));
   },
 
   _initDynamicallyAddedValidations(validationKeys) {
@@ -219,12 +219,12 @@ export default Ember.Mixin.create({
     return !_.isEqual(this.get(propertyName), this._getInitialPropertyValue(propertyName));
   },
 
-  _isDirty() {
-    return _.map(this.properties, (prop) => prop.state.isDirty).indexOf(true) >= 0;
+  _isDirty(lastFlag) {
+    return lastFlag === true ? true : _.map(this.properties, prop => prop.state.isDirty).indexOf(true) >= 0;
   },
 
-  _isLoaded() {
-    return _.map(this.properties, (prop) => prop.state.isLoaded).indexOf(false) === -1;
+  _isLoaded(lastFlag) {
+    return lastFlag === false ? false : _.map(this.properties, prop => prop.state.isLoaded).indexOf(false) === -1;
   },
 
   _updateIsDirty() {
