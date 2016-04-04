@@ -8,11 +8,7 @@ export default Ember.Mixin.create({
   formLossConfirmationMessage: 'Are you sure?',
 
   afterModel() {
-    const FormClass = this.get('formClass');
     const model = this.modelFor(this.routeName);
-
-    Ember.assert('Form route has to define "formClass" property.', !Ember.isEmpty(FormClass));
-
     this.createForm(FormClass, model, this.formExtraProps ? this.formExtraProps(model) : null);
   },
 
@@ -38,7 +34,12 @@ export default Ember.Mixin.create({
     });
   },
 
-  createForm(FormClass, model, extraProps) {
+  createForm(model, extraProps) {
+    const owner = Ember.getOwner(this);
+    const FormClass = this.get('formClass') || owner.resolveRegistration(`form:${this.get('formName')}`);
+
+    Ember.assert('Form class could not be resolved. Maybe invalid formName param?', !Ember.isEmpty(FormClass));
+
     const modelForm = window.form = createFormObject(this, FormClass, model, extraProps);
     this.set('modelForm', modelForm);
     return modelForm;
