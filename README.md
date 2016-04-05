@@ -1,5 +1,7 @@
 # Ember Form Object
 
+[![Build Status](https://semaphoreci.com/api/v1/ilucin/ember-form-object/branches/master/shields_badge.svg)](https://semaphoreci.com/ilucin/ember-form-object)
+
 Form object pattern in Ember apps (similar to ActiveModel Form Objects in Ruby on Rails)
 
 ## Features
@@ -122,9 +124,7 @@ This project is currently in **alpha** state. Public API of the library is still
 
 ### TODOs (by priority)
 * Example page & docs
-* Use ember dependency injection to load form classes
 * Remove lodash dependency
-* Get rid of "container" deprecation warning when instantiating form object
 * Better test coverage
 * Remove form-loss feature from route mixin and just add it as an example
 * Add blueprints for ember-cli
