@@ -9,7 +9,7 @@ export default Ember.Mixin.create({
 
   afterModel() {
     const model = this.modelFor(this.routeName);
-    this.createForm(FormClass, model, this.formExtraProps ? this.formExtraProps(model) : null);
+    this.createForm(model, this.formExtraProps ? this.formExtraProps(model) : null);
   },
 
   setupController(controller) {
