@@ -1,6 +1,6 @@
 {
   "name": "ember-form-object",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Form object pattern for ember apps",
   "directories": {
     "doc": "doc",
