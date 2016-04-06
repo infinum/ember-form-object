@@ -1,7 +1,7 @@
 import { moduleFor, test } from 'ember-qunit';
 import Ember from 'ember';
 import ModelFormObject from 'ember-form-object/forms/model-form';
-import { createFormObject } from 'ember-form-object/utils/core';
+import { createForm } from 'ember-form-object/utils/core';
 import { modelFormObjectClassProps, TestModel } from '../../stubs/form-object';
 
 moduleFor('form:model-form', 'Unit | Forms | model form', {
@@ -15,7 +15,7 @@ moduleFor('form:model-form', 'Unit | Forms | model form', {
     model.setProperties({ modelProp1: '1', modelProp2: '2', modelProp3: '3' });
 
     const FormObjectClass = ModelFormObject.extend(modelFormObjectClassProps);
-    this.form = createFormObject(this, FormObjectClass, model, { extraProp: 'extra' });
+    this.form = createForm(FormObjectClass, this, model, { extraProp: 'extra' });
   },
   afterEach() {
     Ember.run(() => {

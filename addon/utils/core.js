@@ -2,8 +2,16 @@ import Ember from 'ember';
 import DS from 'ember-data';
 import getOwner from 'ember-getowner-polyfill'
 
-function createFormObject(hostObject, FormClass, arg1, arg2) {
-  return new FormClass(getOwner(hostObject), arg1, arg2);
+function createForm(formNameOrClass, hostObject, arg1, arg2) {
+  const owner = Ember.getOwner(hostObject);
+  let FormClass = formNameOrClass;
+
+  if (typeof formNameOrClass === 'string') {
+    FormClass = owner.resolveRegistration(`form:${formName}`);
+    Ember.assert('Form class could not be resolved. Maybe invalid formName param?', !Ember.isEmpty(FormClass));
+  }
+
+  return new FormClass(owner, arg1, arg2);
 }
 
 function isEmberPromise(obj) {
@@ -29,7 +37,7 @@ function depromisifyProperty(prop) {
 }
 
 export {
-  createFormObject,
+  createForm,
   isEmberPromise,
   isThenable,
   depromisifyObject,

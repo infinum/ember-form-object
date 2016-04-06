@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { moduleFor, test } from 'ember-qunit';
 import Ember from 'ember';
 import BaseFormObject from 'ember-form-object/forms/base-form';
-import { createFormObject } from 'ember-form-object/utils/core';
+import { createForm } from 'ember-form-object/utils/core';
 import { baseFormObjectClassProps } from '../../stubs/form-object';
 
 moduleFor('form:base-form', 'Unit | Forms | base form', {
@@ -13,7 +13,7 @@ moduleFor('form:base-form', 'Unit | Forms | base form', {
   ],
   beforeEach() {
     const FormObjectClass = BaseFormObject.extend(baseFormObjectClassProps);
-    this.form = createFormObject(this, FormObjectClass, { extraProp: 'extra' });
+    this.form = createForm(FormObjectClass, this, { extraProp: 'extra' });
   },
   afterEach() {
     Ember.run(() => this.form.destroy());

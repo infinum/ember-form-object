@@ -1,6 +1,6 @@
 /* eslint no-alert: 0 */
 import Ember from 'ember';
-import { createFormObject } from 'ember-form-object/utils/core';
+import { createForm } from 'ember-form-object/utils/core';
 
 export default Ember.Mixin.create({
   _formLossWasConfirmed: false,
@@ -35,12 +35,7 @@ export default Ember.Mixin.create({
   },
 
   createForm(model, extraProps) {
-    const owner = Ember.getOwner(this);
-    const FormClass = this.get('formClass') || owner.resolveRegistration(`form:${this.get('formName')}`);
-
-    Ember.assert('Form class could not be resolved. Maybe invalid formName param?', !Ember.isEmpty(FormClass));
-
-    const form = window.form = createFormObject(this, FormClass, model, extraProps);
+    const form = window.form = createForm(this.get('formName'), this, model, extraProps);
     this.set('form', form);
     return form;
   },
