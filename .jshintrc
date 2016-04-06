@@ -2,7 +2,8 @@
   "predef": [
     "document",
     "window",
-    "-Promise"
+    "setTimeout",
+    "console"
   ],
   "browser": true,
   "boss": true,
