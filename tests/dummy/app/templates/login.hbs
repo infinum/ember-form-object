@@ -1,3 +1,27 @@
 <h1> Base Form Object example </h1>
 
 <h3> Login form </h3>
+
+<table>
+  <tr>
+    <th> Email </th>
+    <td> {{input value=form.email type='text'}} </td>
+  </tr>
+
+  <tr>
+    <th> Password </th>
+    <td> {{input value=form.password type='text'}} </td>
+  </tr>
+
+  <tr> <td> <hr/> </td> <td> <hr/> </td> </tr>
+
+  <tr> <th> isValid </th> <td> {{form.isValid}} </td> </tr>
+  <tr> <th> isLoaded </th> <td> {{form.isLoaded}} </td> </tr>
+  <tr> <th> isDirty </th> <td> {{form.isDirty}} </td> </tr>
+  <tr> <th> isSubmiting </th> <td> {{form.isSubmiting}} </td> </tr>
+
+  <tr>
+    <th> </th>
+    <td> <button type="submit" {{action 'save'}}> Login </button> </td>
+  </tr>
+</table>

@@ -1,9 +1,8 @@
 import Ember from 'ember';
 import FormRouteMixin from 'ember-form-object/mixins/form-route';
-import TodoForm from '../../forms/todo';
 
 export default Ember.Route.extend(FormRouteMixin, {
-  formClass: TodoForm,
+  formName: 'todo',
 
   model(params) {
     return this.store.peekRecord('todo', params.id);
