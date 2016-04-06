@@ -3,7 +3,7 @@ import Ember from 'ember';
 import DS from 'ember-data';
 import EmberValidations from 'ember-validations';
 import FormObjectMixin from 'ember-form-object/mixins/form-object';
-import { depromisifyObject, depromisifyProperty, isThenable } from 'ember-form-object/utils/core';
+import { depromisifyProperty, isThenable } from 'ember-form-object/utils/core';
 
 function propertyTypeReducer(type) {
   return function() {
@@ -71,15 +71,24 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
   syncWithModel() {
     this.set('content', this.get('modelProperties').reduce((obj, propertyName) => {
-      const isAsync = this.get(`properties.${propertyName}.async`);
-      const modelProp = this.get(`model.${propertyName}`);
-      obj[propertyName] = modelProp;
+      const property = this.get(`properties.${propertyName}`);
+      const isAsync = property.async;
+      const modelPropertyValue = this.get(`model.${propertyName}`);
+      const formPropertyValue = modelPropertyValue;
 
-      if (!isAsync && isThenable(modelProp)) {
+      // Think about this. Should we enable initialValue if proxied value is undefined?
+      // if (formPropertyValue === undefined) {
+      //   formPropertyValue = property.initialValue;
+      // } else {
+      //   property.initialValue = formPropertyValue;
+      // }
+
+      if (!isAsync && isThenable(modelPropertyValue)) {
         this.setPropertyState(propertyName, 'isLoaded', false);
-        modelProp.then(() => this.setPropertyState(propertyName, 'isLoaded', true));
+        modelPropertyValue.then(() => this.setPropertyState(propertyName, 'isLoaded', true));
       }
 
+      obj[propertyName] = formPropertyValue;
       return obj;
     }, {}));
   },

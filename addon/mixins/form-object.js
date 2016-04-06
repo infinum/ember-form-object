@@ -2,6 +2,8 @@ import _ from 'lodash';
 import Ember from 'ember';
 import { isThenable, depromisifyProperty } from 'ember-form-object/utils/core';
 
+const createArray = Ember.A;
+
 function normalizeValueForDirtyComparison(val) {
   let normalizedVal = depromisifyProperty(val);
 
@@ -133,7 +135,7 @@ export default Ember.Mixin.create({
 
   _initDynamicallyAddedValidator(validator) {
     validator.addObserver('errors.[]', this, function(sender) {
-      const errors = Ember.A();
+      const errors = createArray();
       this.validators.forEach(function(innerValidator) {
         if (innerValidator.property === sender.property) {
           errors.addObjects(innerValidator.errors);
