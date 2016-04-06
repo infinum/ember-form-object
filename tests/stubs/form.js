@@ -1,17 +1,4 @@
 import Ember from 'ember';
-import DS from 'ember-data';
-
-const MockModel = DS.Model.extend({
-  isNew: true,
-  _internalModel: {
-    clearRelationships() {},
-    recordObjectWillDestroy() {}
-  },
-  rollback() {},
-  save() {
-    return Ember.RSVP.resolve(this);
-  }
-});
 
 const modelFormObjectClassProps = {
   properties: {
@@ -55,23 +42,7 @@ const baseFormObjectClassProps = {
   }
 };
 
-const TestModel = MockModel.extend({
-  modelProp1: '',
-  modelProp2: '',
-  modelProp3: '',
-  modelProp4: '4'
-});
-
-const TimeEntryModel = MockModel.extend({
-  service: null,
-  note: null,
-  date: null,
-  time: 0
-});
-
 export {
   baseFormObjectClassProps,
-  modelFormObjectClassProps,
-  TestModel,
-  TimeEntryModel
+  modelFormObjectClassProps
 };

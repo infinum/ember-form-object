@@ -1,0 +1,32 @@
+import Ember from 'ember';
+import DS from 'ember-data';
+
+function createMockModelClass(modelName) {
+  return DS.Model.extend({
+    isNew: true,
+    _internalModel: {
+      modelName: modelName || '',
+      clearRelationships() {},
+      recordObjectWillDestroy() {}
+    },
+    rollback() {},
+    save() {
+      return Ember.RSVP.resolve(this);
+    }
+  });
+}
+
+const MockModel = createMockModelClass();
+
+const TestModel = createMockModelClass('test').extend({
+  modelProp1: '',
+  modelProp2: '',
+  modelProp3: '',
+  modelProp4: '4'
+});
+
+export {
+  createMockModelClass,
+  MockModel,
+  TestModel
+};

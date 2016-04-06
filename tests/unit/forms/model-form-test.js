@@ -2,7 +2,8 @@ import { moduleFor, test } from 'ember-qunit';
 import Ember from 'ember';
 import ModelFormObject from 'ember-form-object/forms/model-form';
 import { createForm } from 'ember-form-object/utils/core';
-import { modelFormObjectClassProps, TestModel } from '../../stubs/form-object';
+import { modelFormObjectClassProps } from '../../stubs/form';
+import { TestModel } from '../../stubs/model';
 
 moduleFor('form:model-form', 'Unit | Forms | model form', {
   unit: true,

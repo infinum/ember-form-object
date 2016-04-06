@@ -3,7 +3,7 @@ import { moduleFor, test } from 'ember-qunit';
 import Ember from 'ember';
 import BaseFormObject from 'ember-form-object/forms/base-form';
 import { createForm } from 'ember-form-object/utils/core';
-import { baseFormObjectClassProps } from '../../stubs/form-object';
+import { baseFormObjectClassProps } from '../../stubs/form';
 
 moduleFor('form:base-form', 'Unit | Forms | base form', {
   unit: true,
