@@ -26,16 +26,15 @@ export default Ember.Mixin.create({
 
   confirmTransition() {
     return new Ember.RSVP.Promise((resolve, reject) => {
-      if (window.confirm(this.get('formLossConfirmationMessage'))) {
-        resolve();
-      } else {
-        reject();
-      }
+      return window.confirm(this.get('formLossConfirmationMessage')) ? resolve() : reject();
     });
   },
 
   createForm(model, extraProps) {
-    const form = window.form = createForm(this.get('formName'), this, model, extraProps);
+    const formName = this.get('formName');
+    const args = [formName, this].concat(model ? [model, extraProps] : [extraProps]);
+    const form = createForm(...form);
+    window.form = form;
     this.set('form', form);
     return form;
   },
@@ -63,7 +62,6 @@ export default Ember.Mixin.create({
       } else {
         this._formLossWasConfirmed = false;
       }
-
     }
   }
 });
