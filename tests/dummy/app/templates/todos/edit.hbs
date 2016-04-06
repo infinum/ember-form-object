@@ -7,36 +7,36 @@
 <table>
   <tr>
     <th> Title </th>
-    <td> {{input value=modelForm.title type='text'}} </td>
+    <td> {{input value=form.title type='text'}} </td>
   </tr>
 
   <tr>
     <th> Description </th>
-    <td> {{textarea value=modelForm.description}} </td>
+    <td> {{textarea value=form.description}} </td>
   </tr>
 
   <tr>
     <th> Assignee </th>
     <td>
-      {{select-field value=modelForm.assignee options=modelForm.people}}
+      {{select-field value=form.assignee options=form.people}}
     </td>
   </tr>
 
   <tr>
     <th> Completed </th>
-    <td> {{checkbox-field value=modelForm.completed}} </td>
+    <td> {{checkbox-field value=form.completed}} </td>
   </tr>
 
   <tr>
     <th> Subscribers </th>
-    <td> {{#each modelForm.subscribers as |user|}} {{user.name}}, {{/each}} </td>
+    <td> {{#each form.subscribers as |user|}} {{user.name}}, {{/each}} </td>
   </tr>
 
   <tr> <td> <hr/> </td> <td> <hr/> </td> </tr>
 
-  <tr> <th> isLoaded </th> <td> {{modelForm.isLoaded}} </td> </tr>
-  <tr> <th> isDirty </th> <td> {{modelForm.isDirty}} </td> </tr>
-  <tr> <th> isSubmiting </th> <td> {{modelForm.isSubmiting}} </td> </tr>
+  <tr> <th> isLoaded </th> <td> {{form.isLoaded}} </td> </tr>
+  <tr> <th> isDirty </th> <td> {{form.isDirty}} </td> </tr>
+  <tr> <th> isSubmiting </th> <td> {{form.isSubmiting}} </td> </tr>
 
   <tr>
     <th> </th>
@@ -75,23 +75,23 @@
   <table>
     <tr>
       <th> Title </th>
-      <td> {{modelForm.title}} </td>
+      <td> {{form.title}} </td>
     </tr>
     <tr>
       <th> Description </th>
-      <td> {{modelForm.description}} </td>
+      <td> {{form.description}} </td>
     </tr>
     <tr>
       <th> Assignee </th>
-      <td> {{modelForm.assignee.name}} </td>
+      <td> {{form.assignee.name}} </td>
     </tr>
     <tr>
       <th> Completed </th>
-      <td> {{modelForm.completed}} </td>
+      <td> {{form.completed}} </td>
     </tr>
     <tr>
       <th> Subscribers </th>
-      <td> {{#each modelForm.subscribers as |user|}} {{user.name}}, {{/each}} </td>
+      <td> {{#each form.subscribers as |user|}} {{user.name}}, {{/each}} </td>
     </tr>
   </table>
 </td>

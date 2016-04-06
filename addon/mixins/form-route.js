@@ -14,13 +14,13 @@ export default Ember.Mixin.create({
 
   setupController(controller) {
     this._super(...arguments);
-    controller.set('modelForm', this.get('modelForm'));
+    controller.set('form', this.get('form'));
   },
 
   resetController() {
-    const model = this.get('controller.modelForm.model');
+    const model = this.get('controller.form.model');
     if (model && !model.get('isDeleted') && model.get('isNew')) {
-      this.get('controller.modelForm').rollbackAttributes();
+      this.get('controller.form').rollbackAttributes();
     }
   },
 
@@ -40,26 +40,26 @@ export default Ember.Mixin.create({
 
     Ember.assert('Form class could not be resolved. Maybe invalid formName param?', !Ember.isEmpty(FormClass));
 
-    const modelForm = window.form = createFormObject(this, FormClass, model, extraProps);
-    this.set('modelForm', modelForm);
-    return modelForm;
+    const form = window.form = createFormObject(this, FormClass, model, extraProps);
+    this.set('form', form);
+    return form;
   },
 
   deactivate() {
     this._super(...arguments);
-    if (this.get('modelForm')) {
-      this.get('modelForm').destroy();
-      this.set('modelForm', null);
+    if (this.get('form')) {
+      this.get('form').destroy();
+      this.set('form', null);
     }
   },
 
   actions: {
     willTransition(transition) {
-      const modelForm = this.get('controller.modelForm');
+      const form = this.get('controller.form');
 
-      Ember.assert('"modelForm" has to be set on controller when using FormRouteMixin', !Ember.isEmpty(modelForm));
+      Ember.assert('"form" has to be set on controller when using FormRouteMixin', !Ember.isEmpty(form));
 
-      if (this.get('preventFormLoss') && modelForm.get('isDirty') && !this._formLossWasConfirmed) {
+      if (this.get('preventFormLoss') && form.get('isDirty') && !this._formLossWasConfirmed) {
         transition.abort();
         this.confirmTransition().then(() => {
           this._formLossWasConfirmed = true;

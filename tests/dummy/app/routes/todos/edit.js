@@ -11,12 +11,12 @@ export default Ember.Route.extend(FormRouteMixin, {
 
   afterModel() {
     this._super(...arguments);
-    this.set('modelForm.people', this.store.peekAll('user'));
+    this.set('form.people', this.store.peekAll('user'));
   },
 
   actions: {
     saveModelForm() {
-      this.get('modelForm').save();
+      this.get('form').save();
     }
   }
 });
