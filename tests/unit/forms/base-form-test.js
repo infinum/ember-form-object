@@ -161,6 +161,35 @@ test('it should validate dynamically added properties', function(assert) {
   assert.equal(this.form.get('errors.newProp1.length'), 1);
 });
 
+test('it should immediately validate dynamically added properties', function(assert) {
+  this.form.addProperties({
+    newProp1: { value: null, validate: { presence: true } }
+  });
+
+  assert.equal(this.form.get('errors.newProp1.length'), 1);
+});
+
+test('it should return validation status of a specific property', function(assert) {
+  this.form.addProperties({
+    newProp1: { value: null, validate: { presence: true } },
+    newProp2: { value: 'newProp2', validate: { presence: true } },
+    newProp3: { value: null, validate: { presence: true } },
+    newProp4: { value: 'newProp4', validate: { presence: true } },
+    newProp5: { value: 'newProp5'}
+  });
+
+  this.form.set('newProp3', 'newProp3');
+  this.form.set('newProp4', '');
+
+  assert.equal(this.form.isPropertyValid('test'), false);
+  assert.equal(this.form.isPropertyValid('test2'), true);
+  assert.equal(this.form.isPropertyValid('newProp1'), false);
+  assert.equal(this.form.isPropertyValid('newProp2'), true);
+  assert.equal(this.form.isPropertyValid('newProp3'), true);
+  assert.equal(this.form.isPropertyValid('newProp4'), false);
+  assert.equal(this.form.isPropertyValid('newProp5'), true);
+});
+
 test('it should not be dirty after adding new properties dynamically', function(assert) {
   this.form.addProperties({
     newProp1: { value: 'new1' }
