@@ -8,13 +8,16 @@ module.exports = {
       }
     },
     {
-      name: 'ember-1-13',
+      name: 'ember-1.13',
       bower: {
         dependencies: {
-          'ember': '~1.13.0'
+          'ember': '~1.13.0',
+          'ember-data': '~1.13.0',
+          'ember-cli-shims': '~0.0.6'
         },
         resolutions: {
-          'ember': '~1.13.0'
+          'ember': '~1.13.0',
+          'ember-data': '~1.13.0'
         }
       }
     },
