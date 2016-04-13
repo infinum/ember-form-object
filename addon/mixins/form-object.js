@@ -131,6 +131,7 @@ export default Ember.Mixin.create({
       Ember.assert('Something went wrong with dynamically added validations in form object', !!validator);
       this._initDynamicallyAddedValidator(validator);
     });
+    this.validators.invoke('_validate').without(undefined);
   },
 
   _initDynamicallyAddedValidator(validator) {
@@ -179,6 +180,10 @@ export default Ember.Mixin.create({
     }
 
     return prop;
+  },
+
+  isPropertyValid(propertyName) {
+    return !this.get(`errors.${propertyName}.length`);
   },
 
   _getInitialPropertyDefinition(prop) {
