@@ -1,10 +1,9 @@
 # Ember Form Object
 
 [![Build Status](https://semaphoreci.com/api/v1/ilucin/ember-form-object/branches/master/shields_badge.svg)](https://semaphoreci.com/ilucin/ember-form-object)
-
 [![Code Climate](https://codeclimate.com/github/infinum/ember-form-object/badges/gpa.svg)](https://codeclimate.com/github/infinum/ember-form-object)
-
 [![Ember Observer Score](https://emberobserver.com/badges/ember-form-object.svg)](https://emberobserver.com/addons/ember-form-object)
+[![npm version](https://badge.fury.io/js/ember-form-object.svg)](http://badge.fury.io/js/ember-form-object)
 
 Form object pattern in Ember apps (similar to ActiveModel Form Objects in Ruby on Rails)
 
