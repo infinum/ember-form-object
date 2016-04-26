@@ -2,6 +2,10 @@
 
 [![Build Status](https://semaphoreci.com/api/v1/ilucin/ember-form-object/branches/master/shields_badge.svg)](https://semaphoreci.com/ilucin/ember-form-object)
 
+[![Code Climate](https://codeclimate.com/github/infinum/ember-form-object/badges/gpa.svg)](https://codeclimate.com/github/infinum/ember-form-object)
+
+[![Ember Observer Score](https://emberobserver.com/badges/ember-form-object.svg)](https://emberobserver.com/addons/ember-form-object)
+
 Form object pattern in Ember apps (similar to ActiveModel Form Objects in Ruby on Rails)
 
 ## Features
@@ -11,7 +15,7 @@ Form object pattern in Ember apps (similar to ActiveModel Form Objects in Ruby o
 * Properties proxied to / synced from model
 * Virtual & async properties
 * Well defined form save (submit) process with appropriate hooks
-* Manage form "dirty", "loaded" and "submiting" state
+* Manage form "dirty", "loaded", "submiting" and "valid" state
 * Prevent form loss with confirmation when leaving dirty form
 * Add/remove properties in runtime (useful for dynamic forms)
 
@@ -124,6 +128,7 @@ This project is currently in **alpha** state. Public API of the library is still
 ## Development
 
 ### TODOs (by priority)
+* Add "isValid" state to each property
 * Example page & docs
 * Remove lodash dependency
 * Better test coverage
