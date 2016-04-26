@@ -126,19 +126,18 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   _addModelPropertyObservers(propertyNames) {
-    const model = this.get('model');
-    propertyNames.forEach(propertyName => {
-      if (this.properties[propertyName].model) {
-        model.addObserver(propertyName, this, this._modelPropertyDidChange);
-      }
-    });
+    this._setModelPropertyObservers('addObserver', propertyNames);
   },
 
   _removeModelPropertyObservers(propertyNames) {
+    this._setModelPropertyObservers('removeObserver', propertyNames);
+  },
+
+  _setModelPropertyObservers(methodName, propertyNames) {
     const model = this.get('model');
     propertyNames.forEach(propertyName => {
       if (this.properties[propertyName].model) {
-        model.removeObserver(propertyName, this, this._modelPropertyDidChange);
+        model[methodName](propertyName, this, this._modelPropertyDidChange);
       }
     });
   },
