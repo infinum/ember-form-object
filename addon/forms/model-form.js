@@ -39,7 +39,14 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   handleServerValidationErrors() {
-    this.set('errors', this.get('model.errors'));
+    let isValid = true;
+    this.get('model.errors.content').forEach(err => {
+      isValid = false;
+      const errorsKey = `errors.${err.attribute}`;
+      const currentErrors = this.get(errorsKey);
+      this.set(errorsKey, currentErrors.concat([err.message]));
+    });
+    this.set('isValid', isValid && this.get('isValid'));
   },
 
   beforeSubmit() {
