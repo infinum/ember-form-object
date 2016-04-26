@@ -93,6 +93,13 @@ export default Ember.Mixin.create({
     _.forEach(this.properties, (property, propertyName) => this.setPropertyState(propertyName, 'isDirty', !!flag));
   },
 
+  commitState() {
+    _.forEach(this.properties, (property, propertyName) => {
+      property.initialValue = this.get(propertyName);
+      this.setPropertyState(propertyName, 'isDirty', false);
+    });
+  },
+
   addProperties(properties) {
     _.forOwn(properties, (initialProp, key) => {
       this.properties[key] = this._initProperty(initialProp, key);
