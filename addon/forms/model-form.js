@@ -100,6 +100,14 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     }, {}));
   },
 
+  destroy() {
+    const model = this.get('model');
+    if (model.get('isNew')) {
+      model.deleteRecord();
+    }
+    this._super(...arguments);
+  },
+
   _initProperty(initialProp, key) {
     const prop = this._super(...arguments);
     if (prop.virtual) {
