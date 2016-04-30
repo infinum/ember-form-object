@@ -69,7 +69,7 @@ export default Ember.Mixin.create({
 
   save() {
     if (!this.get('isDirty')) {
-      return Ember.RSVP.reject();
+      return Ember.RSVP.reject('Form object is not dirty');
     }
 
     this.setAllPropertiesDirtyFlag(true);
