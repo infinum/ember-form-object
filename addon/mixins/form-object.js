@@ -123,7 +123,9 @@ export default Ember.Mixin.create({
 
   setPropertyState(propertyName, stateName, flag) {
     this.set(`properties.${propertyName}.state.${stateName}`, !!flag);
-    this.set(stateName, this[`_${stateName}`](flag));
+    if (`_${stateName}` in this) {
+      this.set(stateName, this[`_${stateName}`](flag));
+    }
   },
 
   _initDynamicallyAddedValidations(validationKeys) {
