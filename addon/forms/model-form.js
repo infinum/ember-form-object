@@ -22,6 +22,11 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   modelProperties: Ember.computed('properties', propertyTypeReducer('model')).volatile(),
   virtualProperties: Ember.computed('properties', propertyTypeReducer('virtual')).volatile(),
 
+  propertiesServerErrors: Ember.computed(() => {
+    return {};
+  }),
+  otherServerErrors: Ember.computed(() => []),
+
   init(container, model, extraProps) {
     Ember.assert('Form object should be instantiated with DS.Model', model instanceof DS.Model);
     this.model = model;
@@ -39,14 +44,18 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   handleServerValidationErrors() {
-    let isValid = true;
     this.get('model.errors.content').forEach(err => {
-      isValid = false;
-      const errorsKey = `errors.${err.attribute}`;
-      const currentErrors = this.get(errorsKey);
-      this.set(errorsKey, currentErrors.concat([err.message]));
+      const propertyName = err.attribute;
+      const value = this.get(propertyName);
+      const validationError = { propertyName, value, message: err.message };
+
+      if (propertyName in this.properties) {
+        this.get('propertiesServerErrors')[propertyName].pushObject(validationError);
+      } else {
+        this.get('otherServerErrors').pushObject(validationError);
+      }
     });
-    this.set('isValid', isValid && this.get('isValid'));
+    this.validate();
   },
 
   beforeSubmit() {
@@ -55,10 +64,11 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
   submit() {
     return this.get('model').save().catch(() => {
-      // Ako je validacijska
-      this.handleServerValidationErrors();
-      throw new Ember.Object({ name: 'Server validation error' });
-      // inače throw generic error
+      const isServerValidationError = true; // TODO: Calculate this
+      if (isServerValidationError) {
+        this.handleServerValidationErrors();
+      }
+      throw new Ember.Object({ name: isServerValidationError ? 'Server validation error' : 'Error' });
     });
   },
 
@@ -66,8 +76,12 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     this.setAllPropertiesDirtyFlag(false);
   },
 
-  addProperties() {
+  addProperties(properties) {
     this._super(...arguments);
+    const propertiesServerErrors = this.get('propertiesServerErrors');
+    _.keys(properties).forEach(propertyName => {
+      propertiesServerErrors[propertyName] = [];
+    });
     this.syncWithModel();
   },
 
@@ -109,10 +123,15 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   _initProperty(initialProp, key) {
+    initialProp.validate = initialProp.validate || {};
+    initialProp.validate.isValidOnServer = true;
+
     const prop = this._super(...arguments);
+
     if (prop.virtual) {
       prop.sync = (_.isFunction(prop.sync) && prop.sync) || this[`sync${key[0].toUpperCase()}${key.slice(1)}`];
     }
+
     return prop;
   },
 
