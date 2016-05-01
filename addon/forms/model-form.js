@@ -78,11 +78,11 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   addProperties(properties) {
-    this._super(...arguments);
     const propertiesServerErrors = this.get('propertiesServerErrors');
     _.keys(properties).forEach(propertyName => {
       propertiesServerErrors[propertyName] = [];
     });
+    this._super(...arguments);
     this.syncWithModel();
   },
 
