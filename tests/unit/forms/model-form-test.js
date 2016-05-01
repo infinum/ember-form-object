@@ -9,7 +9,8 @@ moduleFor('form:model-form', 'Unit | Forms | model form', {
   unit: true,
   needs: [
     'service:validations',
-    'ember-validations@validator:local/presence'
+    'ember-validations@validator:local/presence',
+    'validator:is-valid-on-server'
   ],
   beforeEach() {
     const model = this.model = new TestModel();

@@ -7,9 +7,11 @@ function createMockModelClass(modelName) {
     _internalModel: {
       modelName: modelName || '',
       clearRelationships() {},
-      recordObjectWillDestroy() {}
+      recordObjectWillDestroy() {},
+      deleteRecord() {}
     },
-    rollback() {},
+    deleteRecord() {},
+    rollbackAttributes() {},
     save() {
       return Ember.RSVP.resolve(this);
     }
