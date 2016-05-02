@@ -4,6 +4,7 @@ import DS from 'ember-data';
 function createMockModelClass(modelName) {
   return DS.Model.extend({
     isNew: true,
+    errors: {},
     _internalModel: {
       modelName: modelName || '',
       clearRelationships() {},

@@ -91,3 +91,62 @@ test('it should enable removing properties dynamically', function(assert) {
   assert.equal(this.form.get('modelProp2'), void 0);
   assert.equal('modelProp4' in this.form.get('properties'), false);
 });
+
+test('it should handle server validation errors', function(assert) {
+  this.model.save = () => {
+    this.model.set('errors', { content: [
+      { attribute: 'modelProp1', message: 'Server error on prop 1' },
+      { attribute: 'modelProp2', message: 'Server error on prop 2' }
+    ] });
+    return Ember.RSVP.reject('422 Unprocessible entity');
+  };
+
+  this.form.set('modelProp1', 'val 1');
+  this.form.set('modelProp2', 'val 2');
+  this.form.set('virtualProp1', 'val 3');
+
+  return this.form.save().then(() => {
+    assert.ok(false, 'Save should not have been resolved');
+  }).catch(() => {
+    assert.equal(this.form.get('errors.modelProp1.length'), 1);
+    assert.equal(this.form.get('errors.modelProp2.length'), 1);
+    assert.equal(this.form.get('errors.modelProp1').objectAt(0), 'Server error on prop 1');
+    assert.equal(this.form.get('errors.modelProp2').objectAt(0), 'Server error on prop 2');
+  });
+});
+
+test('it should rollback model attributes on server validation errors', function(assert) {
+  assert.expect(1);
+
+  this.model.save = () => {
+    this.model.set('errors', { content: [{ attribute: 'modelProp1', message: 'Server error on prop 1' }] });
+    return Ember.RSVP.reject('422 Unprocessible entity');
+  };
+
+  this.model.rollbackAttributes = () => {
+    assert.ok(true, 'Model.rollbackAttributes should have beeen called');
+  };
+
+  this.form.set('virtualProp1', 'val 3');
+
+  return this.form.save().then(() => {
+    assert.ok(false, 'Save should not have been resolved');
+  }).catch(Ember.K);
+});
+
+test('it should handle server validation errors for attributes not in form properties', function(assert) {
+  this.model.save = () => {
+    this.model.set('errors', { content: [{ attribute: 'otherProp', message: 'Other error' }] });
+    return Ember.RSVP.reject('422 Unprocessible entity');
+  };
+
+  this.form.set('virtualProp1', 'val 3');
+
+  return this.form.save().then(() => {
+    assert.ok(false, 'Save should not have been resolved');
+  }).catch(() => {
+    assert.equal(this.form.get('otherServerErrors.length'), 1);
+    assert.equal(this.form.get('otherServerErrors').objectAt(0).propertyName, 'otherProp');
+    assert.equal(this.form.get('otherServerErrors').objectAt(0).message, 'Other error');
+  });
+});
