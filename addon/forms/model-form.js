@@ -25,7 +25,7 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   propertiesServerErrors: Ember.computed(() => {
     return {};
   }),
-  otherServerErrors: Ember.computed(() => []),
+  otherServerErrors: Ember.computed(() => Ember.A()),
 
   init(container, model, extraProps) {
     Ember.assert('Form object should be instantiated with DS.Model', model instanceof DS.Model);
@@ -80,7 +80,7 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   addProperties(properties) {
     const propertiesServerErrors = this.get('propertiesServerErrors');
     _.keys(properties).forEach(propertyName => {
-      propertiesServerErrors[propertyName] = [];
+      propertiesServerErrors[propertyName] = Ember.A();
     });
     this._super(...arguments);
     this.syncWithModel();
