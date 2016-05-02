@@ -55,7 +55,7 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
         this.get('otherServerErrors').pushObject(validationError);
       }
     });
-    this.validate();
+    this.validate().then(Ember.K).catch(Ember.K);
   },
 
   beforeSubmit() {
