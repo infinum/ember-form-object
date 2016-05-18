@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Ember from 'ember';
-import { isThenable, depromisifyProperty } from 'ember-form-object/utils/core';
+import { isThenable, depromisifyProperty, runSafe } from 'ember-form-object/utils/core';
 
 const createArray = Ember.A;
 
@@ -74,19 +74,19 @@ export default Ember.Mixin.create({
 
     this.setAllPropertiesDirtyFlag(true);
 
-    return this.validate().then(() => {
+    return this.validate().then(runSafe(this, () => {
       this.set('isSubmiting', true);
       return this.beforeSubmit(...arguments);
-    }).then(() => {
+    })).then(runSafe(this, () => {
       return this.submit(...arguments);
-    }).then(() => {
+    })).then(runSafe(this, () => {
       return this.afterSubmit(...arguments);
-    }).catch(e => {
+    })).catch(e => {
       Ember.Logger.warn(e);
       throw e;
-    }).finally(() => {
+    }).finally(runSafe(this, () => {
       this.set('isSubmiting', false);
-    });
+    }));
   },
 
   setAllPropertiesDirtyFlag(flag) {
@@ -230,9 +230,9 @@ export default Ember.Mixin.create({
 
     if (isPromiseValue && !value.isFulfilled) {
       this.setPropertyState(propertyName, 'isLoaded', false);
-      value.then(resolvedValue => {
+      value.then(runSafe(this, (resolvedValue) => {
         this.set(propertyName, resolvedValue);
-      });
+      }));
     } else if (!prop.state.isLoaded) {
       this.setPropertyState(propertyName, 'isLoaded', true);
     } else {

@@ -3,7 +3,7 @@ import Ember from 'ember';
 import DS from 'ember-data';
 import EmberValidations from 'ember-validations';
 import FormObjectMixin from 'ember-form-object/mixins/form-object';
-import { depromisifyProperty, isThenable } from 'ember-form-object/utils/core';
+import { depromisifyProperty, isThenable, runSafe } from 'ember-form-object/utils/core';
 
 function propertyTypeReducer(type) {
   return function() {
@@ -107,7 +107,7 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
       if (!isAsync && isThenable(modelPropertyValue)) {
         this.setPropertyState(propertyName, 'isLoaded', false);
-        modelPropertyValue.then(() => this.setPropertyState(propertyName, 'isLoaded', true));
+        modelPropertyValue.then(runSafe(this, () => this.setPropertyState(propertyName, 'isLoaded', true)));
       }
 
       obj[propertyName] = formPropertyValue;

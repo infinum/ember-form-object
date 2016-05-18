@@ -25,6 +25,20 @@ function isThenable(obj) {
   return obj && typeof obj.then === 'function';
 }
 
+function isAlive(obj) {
+  return obj && !obj.isDestroyed && !obj.isDestroying;
+}
+
+function runSafe(unsafeObject, clb, clbContext) {
+  return function() {
+    if (isAlive(unsafeObject)) {
+      return clb.apply(clbContext || this, arguments);
+    }
+
+    return Ember.Logger.debug('Prevented callback that depended on destroyed object');
+  };
+}
+
 function depromisifyObject(obj) {
   if (isEmberPromise(obj) && 'content' in obj) {
     return obj.get('content');
@@ -37,6 +51,8 @@ function depromisifyProperty(prop) {
 }
 
 export {
+  isAlive,
+  runSafe,
   createForm,
   isEmberPromise,
   isThenable,
