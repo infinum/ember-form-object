@@ -7,8 +7,8 @@ export default Ember.Mixin.create({
   preventFormLoss: true,
   formLossConfirmationMessage: 'Are you sure?',
 
-  afterModel() {
-    const model = this.modelFor(this.routeName);
+  afterModel(model) {
+    this._super(...arguments);
     this.createForm(model, this.formExtraProps ? this.formExtraProps(model) : null);
   },
 
