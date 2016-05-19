@@ -42,8 +42,7 @@ test('it should create form from form name', function(assert) {
 test('it should create form with model in afterModel hook', function(assert) {
   const model = new TestModel();
   this.route.formName = 'model';
-  this.route.modelFor = () => model;
-  this.route.afterModel();
+  this.route.afterModel(model);
   assert.equal(this.route.get('form.model'), model);
 });
 
