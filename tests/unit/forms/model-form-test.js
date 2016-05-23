@@ -150,3 +150,28 @@ test('it should handle server validation errors for attributes not in form prope
     assert.equal(this.form.get('otherServerErrors').objectAt(0).message, 'Other error');
   });
 });
+
+test('it should function normally after server side validation errors', function(assert) {
+  this.model.save = () => {
+    this.model.set('errors', { content: [{ attribute: 'otherProp', message: 'Other error' }] });
+    return Ember.RSVP.reject('422 Unprocessible entity');
+  };
+
+  this.form.set('virtualProp1', 'val 3');
+
+  return this.form.save().then(() => {
+    assert.ok(false, 'Save should not have been resolved'); // Server validation error
+  }).catch(() => {
+    return this.form.save();
+  }).then(() => {
+    assert.ok(false, 'Save should not have been resolved'); // Client validation error
+  }).catch(() => {
+    this.model.save = () => {
+      assert.ok(true, 'Save should have been resolved');
+      return Ember.RSVP.resolve();
+    };
+
+    this.form.set('otherProp', 'blabla');
+    return this.form.save();
+  });
+});
