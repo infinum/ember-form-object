@@ -115,9 +115,10 @@ test('it should handle server validation errors', function(assert) {
   });
 });
 
-test('it should rollback model attributes on server validation errors', function(assert) {
+test('it should rollback model attributes on server validation errors only on persisted models', function(assert) {
   assert.expect(1);
 
+  this.model.set('isNew', false);
   this.model.save = () => {
     this.model.set('errors', { content: [{ attribute: 'modelProp1', message: 'Server error on prop 1' }] });
     return Ember.RSVP.reject('422 Unprocessible entity');
