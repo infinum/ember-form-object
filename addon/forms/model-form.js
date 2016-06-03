@@ -181,7 +181,11 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   _setModelPropertiesToModel() {
-    this.model.setProperties(this._getModelPropertiesHash());
+    const modelPropertiesHash = this._getModelPropertiesHash();
+
+    for (const propertyName in modelPropertiesHash) {
+      this.model.set(propertyName, modelPropertiesHash[propertyName]);
+    }
   },
 
   _syncVirtualPropertiesWithModel() {
