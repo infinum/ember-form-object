@@ -177,15 +177,12 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   _modelPropertyDidChange(model, propertyName) {
-    if (!this.get('isSubmiting')) {
-      const areDifferent = depromisifyObject(model.get(propertyName)) !== depromisifyObject(this.get(propertyName));
-
-      if (areDifferent) {
-        if (!this.get('isDirty')) {
-          this.set(propertyName, model.get(propertyName));
-        } else {
-          this.modelPropertyConflictDidOccur(model, propertyName);
-        }
+    const areDifferent = depromisifyObject(model.get(propertyName)) !== depromisifyObject(this.get(propertyName));
+    if (areDifferent) {
+      if (this.get('isSubmiting') || !this.get('isDirty')) {
+        this.set(propertyName, model.get(propertyName));
+      } else {
+        this.modelPropertyConflictDidOccur(model, propertyName);
       }
     }
   },
