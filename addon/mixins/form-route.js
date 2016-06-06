@@ -34,7 +34,6 @@ export default Ember.Mixin.create({
     const formName = this.get('formName');
     const args = [formName, this].concat(model ? [model, extraProps] : [extraProps]);
     const form = createForm(...args);
-    window.form = form;
     this.set('form', form);
     return form;
   },
