@@ -176,3 +176,20 @@ test('it should function normally after server side validation errors', function
     return this.form.save();
   });
 });
+
+test('it should detect model property conflicts', function(assert) {
+  this.form.modelPropertyConflictDidOccur = () => {
+    assert.notOk(true, 'modelPropertyConflictDidOccur shouldn\'t have been called if form property not dirty');
+  };
+
+  this.model.set('modelProp1', '1');
+
+  this.form.modelPropertyConflictDidOccur = (model, propertyName) => {
+    assert.ok(true, 'modelPropertyConflictDidOccur should have been called if form property dirty');
+    assert.equal(model, this.model);
+    assert.equal(propertyName, 'modelProp1');
+  };
+
+  this.form.set('modelProp1', '2');
+  this.model.set('modelProp1', '3');
+});

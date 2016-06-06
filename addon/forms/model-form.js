@@ -125,6 +125,10 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     this._super(...arguments);
   },
 
+  modelPropertyConflictDidOccur(model, propertyName) {
+    Ember.Logger.debug(`ModelFormObject: Model property "${propertyName}" did change while form was dirty`);
+  },
+
   _initProperty(initialProp, key) {
     initialProp.validate = initialProp.validate || {};
     initialProp.validate.isValidOnServer = true;
@@ -172,11 +176,13 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     });
   },
 
-  _modelPropertyDidChange(obj, propertyName) {
-    if (!this.get('isDirty')) {
-      this.set(propertyName, obj.get(propertyName));
-    } else {
-      Ember.Logger.debug('ModelFormObject: Model property did change while form was dirty');
+  _modelPropertyDidChange(model, propertyName) {
+    if (!this.get('isSubmiting')) {
+      if (!this.get('isDirty')) {
+        this.set(propertyName, model.get(propertyName));
+      } else {
+        this.modelPropertyConflictDidOccur(model, propertyName);
+      }
     }
   },
 
