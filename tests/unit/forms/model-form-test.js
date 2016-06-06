@@ -48,7 +48,7 @@ test('it validates model & virtual properties', function(assert) {
   this.form.set('virtualProp1', '');
 
   return this.form.save().then(() => {
-    assert.ok(false, 'Save should not have been resolved');
+    assert.notOk(true, 'Save should not have been resolved');
   }).catch(() => {
     assert.equal(this.form.get('errors.modelProp1.length'), 1);
     assert.equal(this.form.get('errors.virtualProp1.length'), 1);
@@ -72,7 +72,7 @@ test('it sets computed properties to model before submitting', function(assert) 
     return Ember.RSVP.resolve(this.form);
   };
   return this.form.save().catch(() => {
-    assert.ok(false, 'Should not have been rejected');
+    assert.notOk(true, 'Should not have been rejected');
   });
 });
 
@@ -106,7 +106,7 @@ test('it should handle server validation errors', function(assert) {
   this.form.set('virtualProp1', 'val 3');
 
   return this.form.save().then(() => {
-    assert.ok(false, 'Save should not have been resolved');
+    assert.notOk(true, 'Save should not have been resolved');
   }).catch(() => {
     assert.equal(this.form.get('errors.modelProp1.length'), 1);
     assert.equal(this.form.get('errors.modelProp2.length'), 1);
@@ -131,7 +131,7 @@ test('it should rollback model attributes on server validation errors only on pe
   this.form.set('virtualProp1', 'val 3');
 
   return this.form.save().then(() => {
-    assert.ok(false, 'Save should not have been resolved');
+    assert.notOk(true, 'Save should not have been resolved');
   }).catch(Ember.K);
 });
 
@@ -144,7 +144,7 @@ test('it should handle server validation errors for attributes not in form prope
   this.form.set('virtualProp1', 'val 3');
 
   return this.form.save().then(() => {
-    assert.ok(false, 'Save should not have been resolved');
+    assert.notOk(true, 'Save should not have been resolved');
   }).catch(() => {
     assert.equal(this.form.get('otherServerErrors.length'), 1);
     assert.equal(this.form.get('otherServerErrors').objectAt(0).propertyName, 'otherProp');
@@ -161,11 +161,11 @@ test('it should function normally after server side validation errors', function
   this.form.set('virtualProp1', 'val 3');
 
   return this.form.save().then(() => {
-    assert.ok(false, 'Save should not have been resolved'); // Server validation error
+    assert.notOk(true, 'Save should not have been resolved'); // Server validation error
   }).catch(() => {
     return this.form.save();
   }).then(() => {
-    assert.ok(false, 'Save should not have been resolved'); // Client validation error
+    assert.notOk(true, 'Save should not have been resolved'); // Client validation error
   }).catch(() => {
     this.model.save = () => {
       assert.ok(true, 'Save should have been resolved');

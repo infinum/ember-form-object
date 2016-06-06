@@ -53,10 +53,10 @@ test('it should become dirty after changing property from the config', function(
 
 test('it should not start validations on save unless is dirty', function(assert) {
   this.form.validate = function() {
-    assert.ok(false);
+    assert.notOk(true, 'form.validate() should not have been called');
   };
   return this.form.save().then(() => {
-    assert.ok(false, 'save should not have been resolved');
+    assert.notOk(true, 'form.save() should not have been resolved');
   }).catch(() => {
     assert.ok(true);
   });
@@ -64,14 +64,14 @@ test('it should not start validations on save unless is dirty', function(assert)
 
 test('it should not call submit on save unless validation passes', function(assert) {
   this.form.submit = function() {
-    assert.ok(false, 'submit should not have been called');
+    assert.notOk(true, 'submit should not have been called');
   };
 
   this.form.set('test', 'test');
   this.form.set('test', '');
 
   return this.form.save().then(() => {
-    assert.ok(false, 'save should not have been resolved');
+    assert.notOk(true, 'save should not have been resolved');
   }).catch(() => {
     assert.ok(true);
   });
