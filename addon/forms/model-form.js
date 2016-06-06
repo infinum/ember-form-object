@@ -3,7 +3,7 @@ import Ember from 'ember';
 import DS from 'ember-data';
 import EmberValidations from 'ember-validations';
 import FormObjectMixin from 'ember-form-object/mixins/form-object';
-import { depromisifyProperty, isThenable, runSafe } from 'ember-form-object/utils/core';
+import { depromisifyProperty, depromisifyObject, isThenable, runSafe } from 'ember-form-object/utils/core';
 
 function propertyTypeReducer(type) {
   return function() {
@@ -178,10 +178,14 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
   _modelPropertyDidChange(model, propertyName) {
     if (!this.get('isSubmiting')) {
-      if (!this.get('isDirty')) {
-        this.set(propertyName, model.get(propertyName));
-      } else {
-        this.modelPropertyConflictDidOccur(model, propertyName);
+      const areDifferent = depromisifyObject(model.get(propertyName)) !== depromisifyObject(this.get(propertyName));
+
+      if (areDifferent) {
+        if (!this.get('isDirty')) {
+          this.set(propertyName, model.get(propertyName));
+        } else {
+          this.modelPropertyConflictDidOccur(model, propertyName);
+        }
       }
     }
   },
