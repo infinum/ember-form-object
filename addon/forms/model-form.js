@@ -63,7 +63,7 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   submit() {
-    return this.get('model').save().catch(() => {
+    return this.get('model').save().catch((response) => {
       const isServerValidationError = true; // TODO: Calculate this
       if (isServerValidationError) {
         this.handleServerValidationErrors();
@@ -71,7 +71,11 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
       if (!this.get('model.isNew')) {
         this.get('model').rollbackAttributes();
       }
-      throw new Ember.Object({ name: isServerValidationError ? 'Server validation error' : 'Error' });
+      throw new Ember.Object({
+        isServerValidationError,
+        response,
+        name: isServerValidationError ? 'Server validation error' : 'Error'
+      });
     });
   },
 
