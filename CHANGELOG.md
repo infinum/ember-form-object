@@ -1,3 +1,8 @@
+# 0.2.4
+- [FEATURE] Detect conflicts with model properties (via modelPropertyConflictDidOccur)
+- [IMPROVEMENT] Improve detection if form property should be updated after model property had changed
+- [IMPROVEMENT] Expose server response in submit error handler (thx safo6m)
+
 # 0.2.3
 - [BUGFIX] Correctly set model properties to model in _setModelPropertiesToModel
 

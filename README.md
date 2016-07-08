@@ -17,6 +17,7 @@ Form object pattern in Ember apps (similar to ActiveModel Form Objects in Ruby o
 * Manage form "dirty", "loaded", "submiting" and "valid" state
 * Prevent form loss with confirmation when leaving dirty form
 * Add/remove properties in runtime (useful for dynamic forms)
+* Detect model property conflicts while form is being edited (dirty)
 
 ## Installation
 
