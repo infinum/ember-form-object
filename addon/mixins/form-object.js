@@ -201,6 +201,7 @@ export default Ember.Mixin.create({
     return {
       virtual: 'virtual' in prop ? !!prop.virtual : true,
       async: 'async' in prop ? !!prop.async : false,
+      readonly: 'readonly' in prop ? !!prop.readonly : false,
       initialValue: 'value' in prop ? _.result(prop, 'value') : null,
       validate: prop.validate || null
     };
@@ -237,7 +238,7 @@ export default Ember.Mixin.create({
       }));
     } else if (!prop.state.isLoaded) {
       this.setPropertyState(propertyName, 'isLoaded', true);
-    } else {
+    } else if (!prop.readonly) {
       this.setPropertyState(propertyName, 'isDirty', this._shouldPropertyBecomeDirty(propertyName));
     }
   },

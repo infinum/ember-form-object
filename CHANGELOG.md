@@ -1,3 +1,6 @@
+# 0.2.6
+- [FEATURE] - Add support for readonly properties that can't be in dirty state
+
 # 0.2.5
 - [FIX] - Fix update initial value on setting calculated values to virtual properties
 
