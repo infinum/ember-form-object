@@ -158,8 +158,10 @@ export default Ember.Mixin.create({
   _setCalculatedValuesToVirtualProperties(propertyNames) {
     _.forEach(propertyNames, propertyName => {
       const prop = this.properties[propertyName];
+
       if (prop && prop.virtual && _.isFunction(prop.set)) {
-        this.set(propertyName, prop.set.call(this));
+        prop.initialValue = prop.set.call(this);
+        this.set(propertyName, prop.initialValue);
       }
     });
   },
