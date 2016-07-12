@@ -10,14 +10,18 @@ Form object pattern in Ember apps (similar to ActiveModel Form Objects in Ruby o
 ## Features
 
 * Declarative validations (depends on [ember-validations](https://github.com/DockYard/ember-validations) under the hood)
-* Merge client & server side validation errors
+* Handles client & server side validation errors
 * Properties proxied to / synced from model
-* Virtual & async properties
+* Virtual, async & readonly properties
 * Well defined form save (submit) process with appropriate hooks
 * Manage form "dirty", "loaded", "submiting" and "valid" state
 * Prevent form loss with confirmation when leaving dirty form
 * Add/remove properties in runtime (useful for dynamic forms)
-* Detect model property conflicts while form is being edited (dirty)
+* Detect model property conflicts while form is being edited (in "dirty" state)
+
+## Disclaimer
+
+This project is currently in **alpha** phase. Public API of the library is still under active development.
 
 ## Installation
 
@@ -119,10 +123,6 @@ export default BaseForm.extend({
 });
 
 ```
-
-## Disclaimer
-
-This project is currently in **alpha** state. Public API of the library is still under active development.
 
 ## Development
 

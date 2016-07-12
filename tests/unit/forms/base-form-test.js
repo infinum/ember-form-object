@@ -44,8 +44,7 @@ test('it should become dirty after changing property from the config', function(
   this.form.set('test', 'test');
   assert.equal(this.form.get('isDirty'), true);
   assert.equal(this.form.get('properties.test.state.isDirty'), true);
-  assert.equal(this.form.get('properties.test2.state.isDirty'), false)
-  ;
+  assert.equal(this.form.get('properties.test2.state.isDirty'), false);
   this.form.set('test', initialValue);
   assert.equal(this.form.get('isDirty'), false);
   assert.equal(this.form.get('properties.test.state.isDirty'), false);
