@@ -5,6 +5,13 @@ import { createForm } from 'ember-form-object/utils/core';
 import { modelFormObjectClassProps } from '../../stubs/form';
 import { TestModel } from '../../stubs/model';
 
+function setServerValidationErrors(model, errors) {
+  model.save = function() {
+    model.set('errors', { content: errors, length: errors.length });
+    return Ember.RSVP.reject({ isAdapterError: true, message: '422 Unprocessible entity' });
+  };
+}
+
 moduleFor('form:model-form', 'Unit | Forms | model form', {
   unit: true,
   needs: [
@@ -56,11 +63,11 @@ test('it validates model & virtual properties', function(assert) {
 });
 
 test('it syncs properties with model unless property is dirty', function(assert) {
-  this.model.set('modelProp1', 'new 1');
+  Ember.run(() => this.model.set('modelProp1', 'new 1'));
   assert.equal(this.form.get('modelProp1'), 'new 1');
 
   this.form.set('modelProp1', 'new form 1');
-  this.model.set('modelProp1', '1');
+  Ember.run(() => this.model.set('modelProp1', '1'));
   assert.equal(this.form.get('modelProp1'), 'new form 1');
   assert.equal(this.model.get('modelProp1'), '1');
 });
@@ -93,13 +100,10 @@ test('it should enable removing properties dynamically', function(assert) {
 });
 
 test('it should handle server validation errors', function(assert) {
-  this.model.save = () => {
-    this.model.set('errors', { content: [
-      { attribute: 'modelProp1', message: 'Server error on prop 1' },
-      { attribute: 'modelProp2', message: 'Server error on prop 2' }
-    ] });
-    return Ember.RSVP.reject('422 Unprocessible entity');
-  };
+  setServerValidationErrors(this.model, [
+    { attribute: 'modelProp1', message: 'Server error on prop 1' },
+    { attribute: 'modelProp2', message: 'Server error on prop 2' }
+  ]);
 
   this.form.set('modelProp1', 'val 1');
   this.form.set('modelProp2', 'val 2');
@@ -119,10 +123,7 @@ test('it should rollback model attributes on server validation errors only on pe
   assert.expect(1);
 
   this.model.set('isNew', false);
-  this.model.save = () => {
-    this.model.set('errors', { content: [{ attribute: 'modelProp1', message: 'Server error on prop 1' }] });
-    return Ember.RSVP.reject('422 Unprocessible entity');
-  };
+  setServerValidationErrors(this.model, [{ attribute: 'modelProp1', message: 'Server error on prop 1' }]);
 
   this.model.rollbackAttributes = () => {
     assert.ok(true, 'Model.rollbackAttributes should have beeen called');
@@ -136,10 +137,7 @@ test('it should rollback model attributes on server validation errors only on pe
 });
 
 test('it should handle server validation errors for attributes not in form properties', function(assert) {
-  this.model.save = () => {
-    this.model.set('errors', { content: [{ attribute: 'otherProp', message: 'Other error' }] });
-    return Ember.RSVP.reject('422 Unprocessible entity');
-  };
+  setServerValidationErrors(this.model, [{ attribute: 'otherProp', message: 'Other error' }]);
 
   this.form.set('virtualProp1', 'val 3');
 
@@ -153,10 +151,7 @@ test('it should handle server validation errors for attributes not in form prope
 });
 
 test('it should function normally after server side validation errors', function(assert) {
-  this.model.save = () => {
-    this.model.set('errors', { content: [{ attribute: 'otherProp', message: 'Other error' }] });
-    return Ember.RSVP.reject('422 Unprocessible entity');
-  };
+  setServerValidationErrors(this.model, [{ attribute: 'otherProp', message: 'Other error' }]);
 
   this.form.set('virtualProp1', 'val 3');
 
@@ -182,7 +177,7 @@ test('it should detect model property conflicts', function(assert) {
     assert.notOk(true, 'modelPropertyConflictDidOccur shouldn\'t have been called if form property not dirty');
   };
 
-  this.model.set('modelProp1', '1');
+  Ember.run(() => this.model.set('modelProp1', '1'));
 
   this.form.modelPropertyConflictDidOccur = (model, propertyName) => {
     assert.ok(true, 'modelPropertyConflictDidOccur should have been called if form property dirty');
@@ -191,5 +186,5 @@ test('it should detect model property conflicts', function(assert) {
   };
 
   this.form.set('modelProp1', '2');
-  this.model.set('modelProp1', '3');
+  Ember.run(() => this.model.set('modelProp1', '3'));
 });
