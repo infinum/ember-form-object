@@ -63,14 +63,18 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   submit() {
-    return this.get('model').save().catch((response) => {
-      const isServerValidationError = response.isAdapterError && 'errors' in response;
+    const model = this.get('model');
+    return model.save().catch((response) => {
+      const isServerValidationError = response.isAdapterError && model.get('errors.length') > 0;
+
       if (isServerValidationError) {
         this.handleServerValidationErrors();
       }
 
-      if (!this.get('model.isNew')) {
-        this.get('model').rollbackAttributes();
+      if (!model.get('isNew')) {
+        this._isRollbackingOnServerValidationError = true;
+        model.rollbackAttributes();
+        this._isRollbackingOnServerValidationError = false;
       }
 
       throw new Ember.Object({
@@ -182,7 +186,9 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     const areDifferent = depromisifyObject(model.get(propertyName)) !== depromisifyObject(this.get(propertyName));
     if (areDifferent) {
       if (this.get('isSubmiting') || !this.get('isDirty')) {
-        this.set(propertyName, model.get(propertyName));
+        if (!this._isRollbackingOnServerValidationError) {
+          this.set(propertyName, model.get(propertyName));
+        }
       } else {
         this.modelPropertyConflictDidOccur(model, propertyName);
       }
