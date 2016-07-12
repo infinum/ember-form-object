@@ -60,7 +60,6 @@ export default ModelFormObject.extend({
   afterSubmit() {
     this._super(...arguments);
     this.set('description', this.setDescription());
-    this.setAllPropertiesDirtyFlag(false);
   }
 });
 ```

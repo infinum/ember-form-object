@@ -39,7 +39,7 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   setPropertiesToModel() {
-    this._setModelPropertiesToModel();
+    this._setDirtyModelPropertiesToModel();
     this._syncVirtualPropertiesWithModel();
   },
 
@@ -77,10 +77,6 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
         name: isServerValidationError ? 'Server validation error' : 'Error'
       });
     });
-  },
-
-  afterSubmit() {
-    this.setAllPropertiesDirtyFlag(false);
   },
 
   addProperties(properties) {

@@ -60,6 +60,7 @@ export default Ember.Mixin.create({
   },
 
   afterSubmit(result) {
+    this.commitState();
     return result;
   },
 
@@ -71,8 +72,6 @@ export default Ember.Mixin.create({
     if (!this.get('isDirty')) {
       return Ember.RSVP.reject('Form object is not dirty');
     }
-
-    this.setAllPropertiesDirtyFlag(true);
 
     return this.validate().then(runSafe(this, () => {
       this.set('isSubmiting', true);
@@ -87,10 +86,6 @@ export default Ember.Mixin.create({
     }).finally(runSafe(this, () => {
       this.set('isSubmiting', false);
     }));
-  },
-
-  setAllPropertiesDirtyFlag(flag) {
-    _.forEach(this.properties, (property, propertyName) => this.setPropertyState(propertyName, 'isDirty', !!flag));
   },
 
   commitState() {
