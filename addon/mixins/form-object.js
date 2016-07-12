@@ -32,13 +32,13 @@ export default Mixin.create({
     const propertyNames = _.keys(this.properties);
     this._setCalculatedValuesToVirtualProperties(propertyNames);
     this._updateIsLoaded();
-    this._addObservers(propertyNames);
+    this.addObservers(propertyNames);
     this._isInitialized = true;
   }),
 
   destroy() {
     this._super(...arguments);
-    this._removeObservers(_.keys(this.properties));
+    this.removeObservers(_.keys(this.properties));
   },
 
   beforeSubmit() {},
@@ -85,7 +85,7 @@ export default Mixin.create({
   commitState() {
     _.forEach(this.properties, (property, propertyName) => {
       property.initialValue = this.get(propertyName);
-      this.setPropertyState(propertyName, 'isDirty', false);
+      this._setPropertyState(propertyName, 'isDirty', false);
     });
   },
 
@@ -98,7 +98,7 @@ export default Mixin.create({
       const propertyNames = _.keys(properties);
       this._setCalculatedValuesToVirtualProperties(propertyNames);
       this._updateIsLoaded();
-      this._addObservers(propertyNames);
+      this.addObservers(propertyNames);
 
       const validationKeys = _(properties).map((val, key) => val.validate ? key : null).compact().value();
       this._initDynamicallyAddedValidations(validationKeys);
@@ -106,19 +106,46 @@ export default Mixin.create({
   },
 
   removeProperties(propertyNames) {
-    this._removeObservers(propertyNames);
+    this.removeObservers(propertyNames);
     _.forEach(propertyNames, propertyName => this._removeProperty(propertyName));
-  },
-
-  setPropertyState(propertyName, stateName, flag) {
-    this.set(`properties.${propertyName}.state.${stateName}`, !!flag);
-    if (`_${stateName}` in this) {
-      this.set(stateName, this[`_${stateName}`](flag));
-    }
   },
 
   isPropertyValid(propertyName) {
     return !this.get(`errors.${propertyName}.length`);
+  },
+
+  addObservers(propertyNames) {
+    _.forEach(propertyNames, propertyName => this.addObserver(propertyName, this, this._formPropertyDidChange));
+  },
+
+  removeObservers(propertyNames) {
+    _.forEach(propertyNames, propertyName => this.removeObserver(propertyName, this, this._formPropertyDidChange));
+  },
+
+  normalizePropertyDefinition(prop) {
+    return {
+      virtual: 'virtual' in prop ? !!prop.virtual : true,
+      async: 'async' in prop ? !!prop.async : false,
+      readonly: 'readonly' in prop ? !!prop.readonly : false,
+      initialValue: 'value' in prop ? _.result(prop, 'value') : null,
+      validate: prop.validate || null
+    };
+  },
+
+  calculateIsDirty(lastFlag) {
+    return lastFlag === true ? true : _.some(this.properties, prop => prop.state.isDirty);
+  },
+
+  calculateIsLoaded(lastFlag) {
+    return lastFlag === false ? false : _.every(this.properties, prop => prop.state.isLoaded);
+  },
+
+  _setPropertyState(propertyName, stateName, flag) {
+    this.set(`properties.${propertyName}.state.${stateName}`, !!flag);
+    const calculateMethod = `calculate${stateName[0].toUpperCase()}${stateName.slice(1)}`;
+    if (calculateMethod in this) {
+      this.set(stateName, this[calculateMethod](flag));
+    }
   },
 
   _initDynamicallyAddedValidations(validationKeys) {
@@ -167,7 +194,7 @@ export default Mixin.create({
   },
 
   _initProperty(initialProp, key) {
-    const prop = this._getInitialPropertyDefinition(_.isPlainObject(initialProp) ? initialProp : {});
+    const prop = this.normalizePropertyDefinition(_.isPlainObject(initialProp) ? initialProp : {});
     prop.state = this._getInitialPropertyState(prop);
 
     if (prop.virtual) {
@@ -186,29 +213,11 @@ export default Mixin.create({
     return prop;
   },
 
-  _getInitialPropertyDefinition(prop) {
-    return {
-      virtual: 'virtual' in prop ? !!prop.virtual : true,
-      async: 'async' in prop ? !!prop.async : false,
-      readonly: 'readonly' in prop ? !!prop.readonly : false,
-      initialValue: 'value' in prop ? _.result(prop, 'value') : null,
-      validate: prop.validate || null
-    };
-  },
-
   _getInitialPropertyState(prop) {
     return {
       isDirty: false,
       isLoaded: !prop.async
     };
-  },
-
-  _addObservers(propertyNames) {
-    _.forEach(propertyNames, propertyName => this.addObserver(propertyName, this, this._formPropertyDidChange));
-  },
-
-  _removeObservers(propertyNames) {
-    _.forEach(propertyNames, propertyName => this.removeObserver(propertyName, this, this._formPropertyDidChange));
   },
 
   _getInitialPropertyValue(propertyName) {
@@ -221,14 +230,14 @@ export default Mixin.create({
     const isThenableValue = isThenable(value);
 
     if (isThenableValue && !value.isFulfilled) {
-      this.setPropertyState(propertyName, 'isLoaded', false);
+      this._setPropertyState(propertyName, 'isLoaded', false);
       value.then(runSafe(this, (resolvedValue) => {
         this.set(propertyName, resolvedValue);
       }));
     } else if (!prop.state.isLoaded) {
-      this.setPropertyState(propertyName, 'isLoaded', true);
+      this._setPropertyState(propertyName, 'isLoaded', true);
     } else if (!prop.readonly) {
-      this.setPropertyState(propertyName, 'isDirty', this._shouldPropertyBecomeDirty(propertyName));
+      this._setPropertyState(propertyName, 'isDirty', this._shouldPropertyBecomeDirty(propertyName));
     }
   },
 
@@ -244,19 +253,11 @@ export default Mixin.create({
     return !_.isEqual(normalizedValue, normalizedInitialValue);
   },
 
-  _isDirty(lastFlag) {
-    return lastFlag === true ? true : _.map(this.properties, prop => prop.state.isDirty).indexOf(true) >= 0;
-  },
-
-  _isLoaded(lastFlag) {
-    return lastFlag === false ? false : _.map(this.properties, prop => prop.state.isLoaded).indexOf(false) === -1;
-  },
-
   _updateIsDirty() {
-    this.set('isDirty', this._isDirty());
+    this.set('isDirty', this.calculateIsDirty());
   },
 
   _updateIsLoaded() {
-    this.set('isLoaded', this._isLoaded());
+    this.set('isLoaded', this.calculateIsLoaded());
   }
 });

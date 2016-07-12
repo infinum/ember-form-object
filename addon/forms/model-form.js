@@ -119,8 +119,8 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
         // }
 
         if (!property.async && isThenable(modelPropertyValue)) {
-          this.setPropertyState(propertyName, 'isLoaded', false);
-          modelPropertyValue.then(runSafe(this, () => this.setPropertyState(propertyName, 'isLoaded', true)));
+          this._setPropertyState(propertyName, 'isLoaded', false);
+          modelPropertyValue.then(runSafe(this, () => this._setPropertyState(propertyName, 'isLoaded', true)));
         }
 
         obj[propertyName] = formPropertyValue;
@@ -142,6 +142,23 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     Logger.debug(`ModelFormObject: Model property "${propertyName}" did change while form was dirty`);
   },
 
+  addObservers(propertyNames) {
+    this._super(...arguments);
+    this._setModelPropertyObservers('addObserver', propertyNames);
+  },
+
+  removeObservers(propertyNames) {
+    this._super(...arguments);
+    this._setModelPropertyObservers('removeObserver', propertyNames);
+  },
+
+  normalizePropertyDefinition(prop) {
+    const propDef = this._super(...arguments);
+    propDef.model = !('virtual' in prop && !!prop.virtual);
+    propDef.virtual = !propDef.model;
+    return propDef;
+  },
+
   _initProperty(initialProp, key) {
     initialProp.validate = initialProp.validate || {};
     initialProp.validate.isValidOnServer = true;
@@ -153,31 +170,6 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     }
 
     return prop;
-  },
-
-  _getInitialPropertyDefinition(prop) {
-    const propDef = this._super(...arguments);
-    propDef.model = !('virtual' in prop && !!prop.virtual);
-    propDef.virtual = !propDef.model;
-    return propDef;
-  },
-
-  _addObservers(propertyNames) {
-    this._super(...arguments);
-    this._addModelPropertyObservers(propertyNames);
-  },
-
-  _removeObservers(propertyNames) {
-    this._super(...arguments);
-    this._removeModelPropertyObservers(propertyNames);
-  },
-
-  _addModelPropertyObservers(propertyNames) {
-    this._setModelPropertyObservers('addObserver', propertyNames);
-  },
-
-  _removeModelPropertyObservers(propertyNames) {
-    this._setModelPropertyObservers('removeObserver', propertyNames);
   },
 
   _setModelPropertyObservers(methodName, propertyNames) {
