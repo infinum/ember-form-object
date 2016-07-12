@@ -187,12 +187,12 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     }
   },
 
-  _setModelPropertiesToModel() {
-    const modelPropertiesHash = this._getModelPropertiesHash();
-
-    for (const propertyName in modelPropertiesHash) {
-      this.model.set(propertyName, modelPropertiesHash[propertyName]);
-    }
+  _setDirtyModelPropertiesToModel() {
+    _.forEach(this.properties, (prop, propName) => {
+      if (prop.model && prop.state.isDirty) {
+        this.model.set(propName, depromisifyProperty(this.get(propName)));
+      }
+    });
   },
 
   _syncVirtualPropertiesWithModel() {
@@ -204,19 +204,8 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     });
   },
 
-  _resolvePropertyForModelPropertiesHash(propName) {
-    return depromisifyProperty(this.get(propName));
-  },
-
   _getInitialPropertyValue(propertyName) {
     const property = this.properties[propertyName];
     return property.model ? this.get(`model.${propertyName}`) : this._super(...arguments);
-  },
-
-  _getModelPropertiesHash() {
-    return this.get('modelProperties').reduce((prev, attr) => {
-      prev[attr] = this._resolvePropertyForModelPropertiesHash(attr);
-      return prev;
-    }, {});
   }
 });
