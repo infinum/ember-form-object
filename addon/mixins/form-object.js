@@ -1,29 +1,15 @@
 import _ from 'lodash';
 import Ember from 'ember';
-import { isThenable, depromisifyProperty, runSafe } from 'ember-form-object/utils/core';
+import {
+  isThenable, normalizeValueForDirtyComparison, runSafe, getEmberValidationsContainerPolyfill
+} from 'ember-form-object/utils/core';
 
-const createArray = Ember.A;
+const { Mixin, assert, Logger, RSVP, A, on } = Ember;
+const createArray = A;
 
-function normalizeValueForDirtyComparison(val) {
-  let normalizedVal = depromisifyProperty(val);
-
-  if (normalizedVal === null) {
-    normalizedVal = undefined;
-  }
-
-  return normalizedVal;
-}
-
-function getEmberValidationsContainerPolyfill(owner) {
-  return {
-    lookup: module => owner.lookup(module),
-    lookupFactory: module => owner._lookupFactory ? owner._lookupFactory(module) : owner.lookupFactory(module)
-  };
-}
-
-export default Ember.Mixin.create({
+export default Mixin.create({
   init(owner, extraProps) {
-    Ember.assert('Form object should be instantiated with an owner object', !!owner && 'lookup' in owner);
+    assert('Form object should be instantiated with an owner object', !!owner && 'lookup' in owner);
 
     // ember-validations is still performing module lookup on this.controller so we have to fake it
     this.container = getEmberValidationsContainerPolyfill(owner);
@@ -42,7 +28,7 @@ export default Ember.Mixin.create({
     this._super(...arguments);
   },
 
-  onInit: Ember.on('init', function() {
+  onInit: on('init', function() {
     const propertyNames = _.keys(this.properties);
     this._setCalculatedValuesToVirtualProperties(propertyNames);
     this._updateIsLoaded();
@@ -67,12 +53,12 @@ export default Ember.Mixin.create({
   },
 
   submit() {
-    Ember.assert('Has to be implemented', false);
+    assert('Has to be implemented', false);
   },
 
   save() {
     if (!this.get('isDirty')) {
-      return Ember.RSVP.reject('Form object is not dirty');
+      return RSVP.reject('Form object is not dirty');
     }
 
     return this.validate().then(runSafe(this, (result) => {
@@ -92,7 +78,7 @@ export default Ember.Mixin.create({
   },
 
   handleSaveError(err) {
-    Ember.Logger.warn(err);
+    Logger.warn(err);
     throw err;
   },
 
@@ -131,6 +117,10 @@ export default Ember.Mixin.create({
     }
   },
 
+  isPropertyValid(propertyName) {
+    return !this.get(`errors.${propertyName}.length`);
+  },
+
   _initDynamicallyAddedValidations(validationKeys) {
     _.forEach(validationKeys, validationKey => {
       if (this.validations[validationKey].constructor === Object) {
@@ -140,7 +130,7 @@ export default Ember.Mixin.create({
       }
 
       const validator = this.validators.findBy('property', validationKey);
-      Ember.assert('Something went wrong with dynamically added validations in form object', !!validator);
+      assert('Something went wrong with dynamically added validations in form object', !!validator);
       this._initDynamicallyAddedValidator(validator);
     });
     this.validators.invoke('_validate').without(undefined);
@@ -196,10 +186,6 @@ export default Ember.Mixin.create({
     return prop;
   },
 
-  isPropertyValid(propertyName) {
-    return !this.get(`errors.${propertyName}.length`);
-  },
-
   _getInitialPropertyDefinition(prop) {
     return {
       virtual: 'virtual' in prop ? !!prop.virtual : true,
@@ -232,9 +218,9 @@ export default Ember.Mixin.create({
   _formPropertyDidChange(obj, propertyName) {
     const prop = this.get(`properties.${propertyName}`);
     const value = this.get(propertyName);
-    const isPromiseValue = isThenable(value);
+    const isThenableValue = isThenable(value);
 
-    if (isPromiseValue && !value.isFulfilled) {
+    if (isThenableValue && !value.isFulfilled) {
       this.setPropertyState(propertyName, 'isLoaded', false);
       value.then(runSafe(this, (resolvedValue) => {
         this.set(propertyName, resolvedValue);
@@ -252,8 +238,8 @@ export default Ember.Mixin.create({
     const normalizedValue = normalizeValueForDirtyComparison(value);
     const normalizedInitialValue = normalizeValueForDirtyComparison(initialValue);
 
-    // Ember.Logger.debug('ember-form-object: Comparing', value, ' and ', initialValue);
-    // Ember.Logger.debug('ember-form-object: Normalized', normalizedValue, ' and ', normalizedInitialValue);
+    // Logger.debug('ember-form-object: Comparing', value, ' and ', initialValue);
+    // Logger.debug('ember-form-object: Normalized', normalizedValue, ' and ', normalizedInitialValue);
 
     return !_.isEqual(normalizedValue, normalizedInitialValue);
   },

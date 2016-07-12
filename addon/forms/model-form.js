@@ -5,30 +5,22 @@ import EmberValidations from 'ember-validations';
 import FormObjectMixin from 'ember-form-object/mixins/form-object';
 import { depromisifyProperty, depromisifyObject, isThenable, runSafe } from 'ember-form-object/utils/core';
 
-function propertyTypeReducer(type) {
-  return function() {
-    return _.reduce(this.get('properties'), function(arr, property, propertyName) {
-      if (property[type]) {
-        arr.push(propertyName);
-      }
-      return arr;
-    }, []);
-  };
-}
+const { ObjectProxy, computed, assert, Logger, run, A, K } = Ember;
+const createArray = A;
 
-export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
-  isNew: Ember.computed.readOnly('model.isNew'),
+export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
+  isNew: computed.readOnly('model.isNew'),
 
-  modelProperties: Ember.computed('properties', propertyTypeReducer('model')).volatile(),
-  virtualProperties: Ember.computed('properties', propertyTypeReducer('virtual')).volatile(),
-
-  propertiesServerErrors: Ember.computed(() => {
+  propertiesServerErrors: computed(function() {
     return {};
   }),
-  otherServerErrors: Ember.computed(() => Ember.A()),
+
+  otherServerErrors: computed(function() {
+    return createArray();
+  }),
 
   init(container, model, extraProps) {
-    Ember.assert('Form object should be instantiated with DS.Model', model instanceof DS.Model);
+    assert('Form object should be instantiated with DS.Model', model instanceof DS.Model);
     this.model = model;
     this.set('content', {});
     this._modelPropertiesStagedForUpdate = {};
@@ -48,7 +40,9 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     this.get('model.errors.content').forEach(err => {
       const propertyName = err.attribute;
       const value = this.get(propertyName);
-      const validationError = { propertyName, value, message: err.message };
+      const validationError = {
+        propertyName, value, message: err.message
+      };
 
       if (propertyName in this.properties) {
         this.get('propertiesServerErrors')[propertyName].pushObject(validationError);
@@ -56,7 +50,7 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
         this.get('otherServerErrors').pushObject(validationError);
       }
     });
-    this.validate().then(Ember.K).catch(Ember.K);
+    this.validate().then(K).catch(K);
   },
 
   beforeSubmit() {
@@ -100,7 +94,7 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   addProperties(properties) {
     const propertiesServerErrors = this.get('propertiesServerErrors');
     _.keys(properties).forEach(propertyName => {
-      propertiesServerErrors[propertyName] = Ember.A();
+      propertiesServerErrors[propertyName] = createArray();
     });
     this._super(...arguments);
     this.syncWithModel();
@@ -112,25 +106,26 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   syncWithModel() {
-    this.set('content', this.get('modelProperties').reduce((obj, propertyName) => {
-      const property = this.get(`properties.${propertyName}`);
-      const isAsync = property.async;
-      const modelPropertyValue = this.get(`model.${propertyName}`);
-      const formPropertyValue = modelPropertyValue;
+    this.set('content', _.reduce(this.properties, (obj, property, propertyName) => {
+      if (property.model) {
+        const modelPropertyValue = this.get(`model.${propertyName}`);
+        const formPropertyValue = modelPropertyValue;
 
-      // Think about this. Should we enable initialValue if proxied value is undefined?
-      // if (formPropertyValue === undefined) {
-      //   formPropertyValue = property.initialValue;
-      // } else {
-      //   property.initialValue = formPropertyValue;
-      // }
+        // Should we enable initialValue if proxied value is undefined?
+        // if (formPropertyValue === undefined) {
+        //   formPropertyValue = property.initialValue;
+        // } else {
+        //   property.initialValue = formPropertyValue;
+        // }
 
-      if (!isAsync && isThenable(modelPropertyValue)) {
-        this.setPropertyState(propertyName, 'isLoaded', false);
-        modelPropertyValue.then(runSafe(this, () => this.setPropertyState(propertyName, 'isLoaded', true)));
+        if (!property.async && isThenable(modelPropertyValue)) {
+          this.setPropertyState(propertyName, 'isLoaded', false);
+          modelPropertyValue.then(runSafe(this, () => this.setPropertyState(propertyName, 'isLoaded', true)));
+        }
+
+        obj[propertyName] = formPropertyValue;
       }
 
-      obj[propertyName] = formPropertyValue;
       return obj;
     }, {}));
   },
@@ -144,7 +139,7 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   modelPropertyConflictDidOccur(model, propertyName) {
-    Ember.Logger.debug(`ModelFormObject: Model property "${propertyName}" did change while form was dirty`);
+    Logger.debug(`ModelFormObject: Model property "${propertyName}" did change while form was dirty`);
   },
 
   _initProperty(initialProp, key) {
@@ -195,14 +190,16 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   _modelPropertyDidChange(model, propertyName) {
+    Logger.log('Model property did change', propertyName);
     if (!this._isRollbackingOnServerValidationError && !this._modelPropertiesStagedForUpdate[propertyName]) {
       this._modelPropertiesStagedForUpdate[propertyName] = true;
-      Ember.run.scheduleOnce('sync', this, this._processStagedModelPropertyUpdates);
+      run.scheduleOnce('sync', this, this._processStagedModelPropertyUpdates);
     }
   },
 
   _processStagedModelPropertyUpdates() {
     const model = this.get('model');
+    Logger.log('Processing staged model property updates', Object.keys(this._modelPropertiesStagedForUpdate));
     _.forEach(this._modelPropertiesStagedForUpdate, (_val, propertyName) => {
       this._processStagedModelPropertyUpdate(model, propertyName);
     });
@@ -229,10 +226,9 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   _syncVirtualPropertiesWithModel() {
-    this.get('virtualProperties').forEach(key => {
-      const prop = this.get('properties')[key];
-      if (prop.sync) {
-        prop.sync.call(this);
+    _.forEach(this.properties, (property) => {
+      if (property.virtual && property.sync) {
+        property.sync.call(this);
       }
     });
   },

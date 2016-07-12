@@ -50,6 +50,23 @@ function depromisifyProperty(prop) {
   return prop && prop.toArray ? prop.toArray().map(depromisifyObject) : depromisifyObject(prop);
 }
 
+function getEmberValidationsContainerPolyfill(owner) {
+  return {
+    lookup: module => owner.lookup(module),
+    lookupFactory: module => owner._lookupFactory ? owner._lookupFactory(module) : owner.lookupFactory(module)
+  };
+}
+
+function normalizeValueForDirtyComparison(val) {
+  let normalizedVal = depromisifyProperty(val);
+
+  if (normalizedVal === null) {
+    normalizedVal = undefined;
+  }
+
+  return normalizedVal;
+}
+
 export {
   isAlive,
   runSafe,
@@ -57,5 +74,7 @@ export {
   isEmberPromise,
   isThenable,
   depromisifyObject,
-  depromisifyProperty
+  depromisifyProperty,
+  getEmberValidationsContainerPolyfill,
+  normalizeValueForDirtyComparison
 };
