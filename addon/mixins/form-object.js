@@ -61,6 +61,9 @@ export default Ember.Mixin.create({
 
   resetFormAfterSubmit() {
     this._setCalculatedValuesToVirtualProperties(Object.keys(this.properties));
+
+    // Form can't be dirty after submit
+    this.set('isDirty', false);
   },
 
   submit() {

@@ -62,6 +62,17 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     this.setPropertiesToModel();
   },
 
+  resetFormAfterSubmit() {
+    // Reset model properties dirty state after submit
+    _.forEach(this.properties, (prop, propName) => {
+      if (prop.model) {
+        this.set(`properties.${propName}.state.isDirty`, false);
+      }
+    });
+
+    return this._super(...arguments);
+  },
+
   submit() {
     const model = this.get('model');
     return model.save().catch((response) => {
