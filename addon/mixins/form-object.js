@@ -81,12 +81,16 @@ export default Ember.Mixin.create({
       return this.afterSubmit(...arguments) || result;
     })).then(runSafe(this, (result) => {
       return this.resetFormAfterSubmit() || result;
-    })).catch(e => {
-      Ember.Logger.warn(e);
-      throw e;
+    })).catch((e) => {
+      this.handleSaveError(e);
     }).finally(runSafe(this, () => {
       this.set('isSubmiting', false);
     }));
+  },
+
+  handleSaveError(err) {
+    Ember.Logger.warn(err);
+    throw err;
   },
 
   commitState() {
