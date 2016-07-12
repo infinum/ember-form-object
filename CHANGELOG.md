@@ -1,5 +1,8 @@
-# 0.2.6
 - [FEATURE] - Add support for readonly properties that can't be in dirty state
+- [BREAKING] - Remove setAllPropertiesDirtyFlag public API
+- [IMPROVEMENT] - Add resetting virtual properties & dirty state after submit
+- [BUGFIX] - Detect server validation error properly
+- [BUGIFX] - Disable model property sync on model rollback after server validation error
 
 # 0.2.5
 - [FIX] - Fix update initial value on setting calculated values to virtual properties
