@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Ember Form Object by infinum</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Ember Form Object</h1>
+      <h2 class="project-tagline">Form object pattern in ember apps</h2>
+      <a href="https://github.com/infinum/ember-form-object" class="btn">View on GitHub</a>
+      <a href="https://github.com/infinum/ember-form-object/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/infinum/ember-form-object/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="ember-form-object" class="anchor" href="#ember-form-object" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Ember Form Object</h1>
+
+<p><a href="https://semaphoreci.com/ilucin/ember-form-object"><img src="https://semaphoreci.com/api/v1/ilucin/ember-form-object/branches/master/shields_badge.svg" alt="Build Status"></a>
+<a href="https://codeclimate.com/github/infinum/ember-form-object"><img src="https://codeclimate.com/github/infinum/ember-form-object/badges/gpa.svg" alt="Code Climate"></a>
+<a href="https://emberobserver.com/addons/ember-form-object"><img src="https://emberobserver.com/badges/ember-form-object.svg" alt="Ember Observer Score"></a>
+<a href="http://badge.fury.io/js/ember-form-object"><img src="https://badge.fury.io/js/ember-form-object.svg" alt="npm version"></a></p>
+
+<p>Form object pattern in Ember apps (similar to ActiveModel Form Objects in Ruby on Rails)</p>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>Declarative validations (depends on <a href="https://github.com/DockYard/ember-validations">ember-validations</a> under the hood)</li>
+<li>Merge client &amp; server side validation errors</li>
+<li>Properties proxied to / synced from model</li>
+<li>Virtual &amp; async properties</li>
+<li>Well defined form save (submit) process with appropriate hooks</li>
+<li>Manage form "dirty", "loaded", "submiting" and "valid" state</li>
+<li>Prevent form loss with confirmation when leaving dirty form</li>
+<li>Add/remove properties in runtime (useful for dynamic forms)</li>
+<li>Detect model property conflicts while form is being edited (dirty)</li>
+</ul>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+
+<div class="highlight highlight-source-js"><pre>ember install ember<span class="pl-k">-</span>form<span class="pl-k">-</span>object</pre></div>
+
+<h2>
+<a id="example-usage" class="anchor" href="#example-usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example usage</h2>
+
+<h5>
+<a id="form-object-for-todo-model" class="anchor" href="#form-object-for-todo-model" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Form object for todo model</h5>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// app/forms/todo.js</span>
+
+<span class="pl-k">import</span> <span class="pl-smi">Ember</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>ember<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">ModelFormObject</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>ember-form-object/forms/model-form<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">ModelFormObject</span>.<span class="pl-en">extend</span>({
+  properties<span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span><span class="pl-k">:</span> { validate<span class="pl-k">:</span> { presence<span class="pl-k">:</span> <span class="pl-c1">true</span> } },
+    <span class="pl-s"><span class="pl-pds">'</span>completed<span class="pl-pds">'</span></span><span class="pl-k">:</span> {},
+    <span class="pl-s"><span class="pl-pds">'</span>assignee<span class="pl-pds">'</span></span><span class="pl-k">:</span> {},
+    <span class="pl-s"><span class="pl-pds">'</span>subscribers<span class="pl-pds">'</span></span><span class="pl-k">:</span> { async<span class="pl-k">:</span> <span class="pl-c1">true</span> },
+    <span class="pl-s"><span class="pl-pds">'</span>description<span class="pl-pds">'</span></span><span class="pl-k">:</span> { virtual<span class="pl-k">:</span> <span class="pl-c1">true</span>, validate<span class="pl-k">:</span> { presence<span class="pl-k">:</span> <span class="pl-c1">true</span> } },
+    <span class="pl-s"><span class="pl-pds">'</span>people<span class="pl-pds">'</span></span><span class="pl-k">:</span> { virtual<span class="pl-k">:</span> <span class="pl-c1">true</span>, async<span class="pl-k">:</span> <span class="pl-c1">true</span> }
+  },
+
+  <span class="pl-en">setDescription</span>() {
+    <span class="pl-k">return</span> <span class="pl-v">this</span>.<span class="pl-en">get</span>(<span class="pl-s"><span class="pl-pds">'</span>model.description<span class="pl-pds">'</span></span>);
+  },
+
+  <span class="pl-en">syncDescription</span>() {
+    <span class="pl-k">const</span> <span class="pl-c1">parsedDescription</span> <span class="pl-k">=</span> <span class="pl-smi">Ember</span>.<span class="pl-smi">String</span>.<span class="pl-en">capitalize</span>(<span class="pl-v">this</span>.<span class="pl-en">get</span>(<span class="pl-s"><span class="pl-pds">'</span>description<span class="pl-pds">'</span></span>).<span class="pl-en">trim</span>());
+    <span class="pl-v">this</span>.<span class="pl-en">set</span>(<span class="pl-s"><span class="pl-pds">'</span>model.description<span class="pl-pds">'</span></span>, parsedDescription);
+  },
+
+  <span class="pl-en">beforeSubmit</span>() {
+    <span class="pl-v">this</span>.<span class="pl-en">_super</span>(<span class="pl-k">...</span>arguments);
+  },
+
+  <span class="pl-en">afterSubmit</span>() {
+    <span class="pl-v">this</span>.<span class="pl-en">_super</span>(<span class="pl-k">...</span>arguments);
+    <span class="pl-v">this</span>.<span class="pl-en">set</span>(<span class="pl-s"><span class="pl-pds">'</span>description<span class="pl-pds">'</span></span>, <span class="pl-v">this</span>.<span class="pl-en">setDescription</span>());
+  }
+});</pre></div>
+
+<h5>
+<a id="route-with-form-route-mixin-which-instantiates-todo-form-object" class="anchor" href="#route-with-form-route-mixin-which-instantiates-todo-form-object" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Route with form route mixin (which instantiates todo form object)</h5>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">Ember</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>ember<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">FormRouteMixin</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>ember-form-object/mixins/form-route<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">Ember</span>.<span class="pl-smi">Route</span>.<span class="pl-en">extend</span>(FormRouteMixin, {
+  formName<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>todo<span class="pl-pds">'</span></span>,
+
+  <span class="pl-en">model</span>(<span class="pl-smi">params</span>) {
+    <span class="pl-k">return</span> <span class="pl-v">this</span>.<span class="pl-smi">store</span>.<span class="pl-en">peekRecord</span>(<span class="pl-s"><span class="pl-pds">'</span>todo<span class="pl-pds">'</span></span>, <span class="pl-smi">params</span>.<span class="pl-c1">id</span>);
+  },
+
+  <span class="pl-en">afterModel</span>() {
+    <span class="pl-v">this</span>.<span class="pl-en">_super</span>(<span class="pl-k">...</span>arguments);
+    <span class="pl-v">this</span>.<span class="pl-en">set</span>(<span class="pl-s"><span class="pl-pds">'</span>form.people<span class="pl-pds">'</span></span>, <span class="pl-v">this</span>.<span class="pl-smi">store</span>.<span class="pl-en">peekAll</span>(<span class="pl-s"><span class="pl-pds">'</span>user<span class="pl-pds">'</span></span>));
+  },
+
+  actions<span class="pl-k">:</span> {
+    <span class="pl-en">saveModelForm</span>() {
+      <span class="pl-v">this</span>.<span class="pl-en">get</span>(<span class="pl-s"><span class="pl-pds">'</span>form<span class="pl-pds">'</span></span>).<span class="pl-en">save</span>();
+      <span class="pl-c">// .then() =&gt; form saved</span>
+      <span class="pl-c">// .catch() =&gt; validation probably failed</span>
+    }
+  }
+});</pre></div>
+
+<h5>
+<a id="non-model-form-object-usage-login-form" class="anchor" href="#non-model-form-object-usage-login-form" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Non-model form object usage (login form)</h5>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">Ember</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>ember<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">BaseForm</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>ember-form-object/forms/base-form<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">BaseForm</span>.<span class="pl-en">extend</span>({
+  properties<span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">'</span>email<span class="pl-pds">'</span></span><span class="pl-k">:</span> {
+      value<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+      validate<span class="pl-k">:</span> { presence<span class="pl-k">:</span> <span class="pl-c1">true</span> }
+    },
+    <span class="pl-s"><span class="pl-pds">'</span>password<span class="pl-pds">'</span></span><span class="pl-k">:</span> {
+      value<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+      validate<span class="pl-k">:</span> { presence<span class="pl-k">:</span> <span class="pl-c1">true</span> }
+    },
+    <span class="pl-s"><span class="pl-pds">'</span>rememberMe<span class="pl-pds">'</span></span><span class="pl-k">:</span> {
+      value<span class="pl-k">:</span> <span class="pl-c1">false</span>
+    }
+  },
+
+  <span class="pl-en">submit</span>() {
+    <span class="pl-k">const</span> <span class="pl-c1">credentials</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.<span class="pl-en">getProperties</span>(<span class="pl-s"><span class="pl-pds">'</span>email<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>password<span class="pl-pds">'</span></span>);
+    <span class="pl-c">// This is mocked, you should actually login here :)</span>
+    <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-en">Ember.RSVP</span>.<span class="pl-en">Promise</span>((<span class="pl-smi">resolve</span>) <span class="pl-k">=&gt;</span> <span class="pl-c1">setTimeout</span>(() <span class="pl-k">=&gt;</span> <span class="pl-en">resolve</span>(credentials), <span class="pl-c1">1000</span>));
+  }
+});
+</pre></div>
+
+<h2>
+<a id="disclaimer" class="anchor" href="#disclaimer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Disclaimer</h2>
+
+<p>This project is currently in <strong>alpha</strong> state. Public API of the library is still under active development.</p>
+
+<h2>
+<a id="development" class="anchor" href="#development" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Development</h2>
+
+<h3>
+<a id="todos-by-priority" class="anchor" href="#todos-by-priority" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>TODOs (by priority)</h3>
+
+<ul>
+<li>Add "isValid" state to each property</li>
+<li>Example page &amp; docs</li>
+<li>Remove lodash dependency</li>
+<li>Better test coverage</li>
+<li>Remove form-loss feature from route mixin and just add it as an example</li>
+<li>Add blueprints for ember-cli</li>
+</ul>
+
+<h3>
+<a id="setup-development-environment" class="anchor" href="#setup-development-environment" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup development environment</h3>
+
+<ul>
+<li>
+<code>git clone</code> this repository</li>
+<li><code>npm install</code></li>
+<li><code>bower install</code></li>
+</ul>
+
+<h3>
+<a id="running-dummy-app" class="anchor" href="#running-dummy-app" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running dummy app</h3>
+
+<ul>
+<li><code>ember server</code></li>
+<li>Visit your app at http://localhost:4200.</li>
+</ul>
+
+<h3>
+<a id="running-tests" class="anchor" href="#running-tests" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running Tests</h3>
+
+<ul>
+<li>
+<code>npm test</code> (Runs <code>ember try:testall</code> to test your addon against multiple Ember versions)</li>
+<li><code>ember test</code></li>
+<li><code>ember test --server</code></li>
+</ul>
+
+<h2>
+<a id="authors" class="anchor" href="#authors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors</h2>
+
+<ul>
+<li><a href="http://github.com/ilucin">Ivan Lučin</a></li>
+<li><a href="http://github.com/janvarljen">Jan Varljen</a></li>
+</ul>
+
+<h2>
+<a id="want-to-help" class="anchor" href="#want-to-help" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Want to help?</h2>
+
+<p>Contributors welcome.</p>
+
+<h2>
+<a id="legal" class="anchor" href="#legal" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Legal</h2>
+
+<p><a href="http://infinum.co">Infinum LTD</a> © 2016</p>
+
+<p><a href="http://twitter.com/infinumco">@infinumco</a></p>
+
+<p><a href="http://www.opensource.org/licenses/mit-license.php">Licensed under the MIT license</a></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/infinum/ember-form-object">Ember Form Object</a> is maintained by <a href="https://github.com/infinum">infinum</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
