@@ -31,6 +31,7 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     Ember.assert('Form object should be instantiated with DS.Model', model instanceof DS.Model);
     this.model = model;
     this.set('content', {});
+    this._modelPropertiesStagedForUpdate = {};
     this._super(container, extraProps);
   },
 
@@ -194,12 +195,25 @@ export default Ember.ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   _modelPropertyDidChange(model, propertyName) {
+    if (!this._isRollbackingOnServerValidationError && !this._modelPropertiesStagedForUpdate[propertyName]) {
+      this._modelPropertiesStagedForUpdate[propertyName] = true;
+      Ember.run.scheduleOnce('sync', this, this._processStagedModelPropertyUpdates);
+    }
+  },
+
+  _processStagedModelPropertyUpdates() {
+    const model = this.get('model');
+    _.forEach(this._modelPropertiesStagedForUpdate, (_val, propertyName) => {
+      this._processStagedModelPropertyUpdate(model, propertyName);
+    });
+    this._modelPropertiesStagedForUpdate = {};
+  },
+
+  _processStagedModelPropertyUpdate(model, propertyName) {
     const areDifferent = depromisifyObject(model.get(propertyName)) !== depromisifyObject(this.get(propertyName));
     if (areDifferent) {
       if (this.get('isSubmiting') || !this.get('isDirty')) {
-        if (!this._isRollbackingOnServerValidationError) {
-          this.set(propertyName, model.get(propertyName));
-        }
+        this.set(propertyName, model.get(propertyName));
       } else {
         this.modelPropertyConflictDidOccur(model, propertyName);
       }
