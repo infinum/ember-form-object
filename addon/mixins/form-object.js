@@ -55,13 +55,12 @@ export default Ember.Mixin.create({
     this._removeObservers(_.keys(this.properties));
   },
 
-  beforeSubmit(result) {
-    return result;
-  },
+  beforeSubmit() {},
 
-  afterSubmit(result) {
-    this.commitState();
-    return result;
+  afterSubmit() {},
+
+  resetFormAfterSubmit() {
+    this._setCalculatedValuesToVirtualProperties(Object.keys(this.properties));
   },
 
   submit() {
@@ -73,13 +72,15 @@ export default Ember.Mixin.create({
       return Ember.RSVP.reject('Form object is not dirty');
     }
 
-    return this.validate().then(runSafe(this, () => {
+    return this.validate().then(runSafe(this, (result) => {
       this.set('isSubmiting', true);
-      return this.beforeSubmit(...arguments);
-    })).then(runSafe(this, () => {
-      return this.submit(...arguments);
-    })).then(runSafe(this, () => {
-      return this.afterSubmit(...arguments);
+      return this.beforeSubmit(...arguments) || result;
+    })).then(runSafe(this, (result) => {
+      return this.submit(...arguments) || result;
+    })).then(runSafe(this, (result) => {
+      return this.afterSubmit(...arguments) || result;
+    })).then(runSafe(this, (result) => {
+      return this.resetFormAfterSubmit() || result;
     })).catch(e => {
       Ember.Logger.warn(e);
       throw e;
