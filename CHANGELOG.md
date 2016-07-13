@@ -1,3 +1,6 @@
+- [IMPROVEMENT] - Fix value normalization for dirty comparison (when comparing arrays)
+- [FEATURE] - Add "isSaveError" state
+
 # 0.2.6
 - [FEATURE] - Add support for readonly properties that can't be in dirty state
 - [BREAKING] - Remove setAllPropertiesDirtyFlag public API
