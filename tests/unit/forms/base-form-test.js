@@ -61,13 +61,47 @@ test('it should not start validations on save unless is dirty', function(assert)
   });
 });
 
+test('it should be in "isSaveError" state if save fails', function(assert) {
+  this.form.submit = function() {
+    assert.notOk(true, 'submit should not have been called');
+  };
+
+  this.form.set('test2', '');
+
+  return this.form.save().then(() => {
+    assert.notOk(true, 'save should not have been resolved');
+  }).catch(() => {
+    assert.equal(this.form.get('isSaveError'), true);
+  });
+});
+
+test('it should reset "isSaveError" state after save', function(assert) {
+  this.form.submit = function() {
+    return Ember.RSVP.resolve();
+  };
+
+  this.form.set('test', 'pero');
+  this.form.set('isSaveError', true);
+
+  return this.form.save().then(() => {
+    assert.equal(this.form.get('isSaveError'), false);
+  }).catch(() => {
+    assert.notOk(true, 'save should have been resolved');
+  });
+});
+
 test('it should not call submit on save unless validation passes', function(assert) {
   this.form.submit = function() {
     assert.notOk(true, 'submit should not have been called');
   };
 
-  this.form.set('test', 'test');
-  this.form.set('test', '');
+  const oldValidate = this.form.validate;
+  this.form.validate = () => {
+    assert.ok(true, 'validate should have been called');
+    return oldValidate.apply(this.form, arguments);
+  };
+
+  this.form.set('test2', '');
 
   return this.form.save().then(() => {
     assert.notOk(true, 'save should not have been resolved');
