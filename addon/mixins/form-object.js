@@ -250,9 +250,6 @@ export default Mixin.create({
     const normalizedValue = normalizeValueForDirtyComparison(value);
     const normalizedInitialValue = normalizeValueForDirtyComparison(initialValue, Ember.isArray(normalizedValue));
 
-    // Logger.debug('ember-form-object: Comparing', value, ' and ', initialValue);
-    // Logger.debug('ember-form-object: Normalized', normalizedValue, ' and ', normalizedInitialValue);
-
     return !_.isEqual(normalizedValue, normalizedInitialValue);
   },
 

@@ -32,10 +32,8 @@ function isAlive(obj) {
 function runSafe(unsafeObject, clb, clbContext) {
   return function() {
     if (isAlive(unsafeObject)) {
-      return clb.apply(clbContext || this, arguments);
+      clb.apply(clbContext || this, arguments);
     }
-
-    return Ember.Logger.debug('Prevented callback that depended on destroyed object');
   };
 }
 

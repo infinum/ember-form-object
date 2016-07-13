@@ -182,7 +182,6 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   _modelPropertyDidChange(model, propertyName) {
-    Logger.log('Model property did change', propertyName);
     if (!this._isModelPropertySyncDisabled && !this._modelPropertiesStagedForUpdate[propertyName]) {
       this._modelPropertiesStagedForUpdate[propertyName] = true;
       run.scheduleOnce('sync', this, this._processStagedModelPropertyUpdates);
@@ -191,7 +190,6 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
   _processStagedModelPropertyUpdates() {
     const model = this.get('model');
-    Logger.log('Processing staged model property updates', Object.keys(this._modelPropertiesStagedForUpdate));
     _.forEach(this._modelPropertiesStagedForUpdate, (_val, propertyName) => {
       this._processStagedModelPropertyUpdate(model, propertyName);
     });
