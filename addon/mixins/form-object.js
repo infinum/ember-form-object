@@ -245,7 +245,7 @@ export default Mixin.create({
     const value = this.get(propertyName);
     const initialValue = this._getInitialPropertyValue(propertyName);
     const normalizedValue = normalizeValueForDirtyComparison(value);
-    const normalizedInitialValue = normalizeValueForDirtyComparison(initialValue);
+    const normalizedInitialValue = normalizeValueForDirtyComparison(initialValue, Ember.isArray(normalizedValue));
 
     // Logger.debug('ember-form-object: Comparing', value, ' and ', initialValue);
     // Logger.debug('ember-form-object: Normalized', normalizedValue, ' and ', normalizedInitialValue);

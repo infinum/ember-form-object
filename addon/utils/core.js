@@ -57,10 +57,12 @@ function getEmberValidationsContainerPolyfill(owner) {
   };
 }
 
-function normalizeValueForDirtyComparison(val) {
+function normalizeValueForDirtyComparison(val, isArray) {
   let normalizedVal = depromisifyProperty(val);
 
-  if (normalizedVal === null) {
+  if (!normalizedVal && isArray) {
+    normalizedVal = [];
+  } else if (normalizedVal === null) {
     normalizedVal = undefined;
   }
 
