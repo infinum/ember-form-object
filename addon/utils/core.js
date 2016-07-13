@@ -29,11 +29,12 @@ function isAlive(obj) {
   return obj && !obj.isDestroyed && !obj.isDestroying;
 }
 
-function runSafe(unsafeObject, clb, clbContext) {
+function runSafe(unsafeObject, clb, clbContext, fallbackReturnValue) {
   return function() {
     if (isAlive(unsafeObject)) {
-      clb.apply(clbContext || this, arguments);
+      return clb.apply(clbContext || this, arguments);
     }
+    return fallbackReturnValue;
   };
 }
 
