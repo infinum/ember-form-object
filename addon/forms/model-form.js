@@ -78,9 +78,9 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
       }
 
       if (!model.get('isNew')) {
-        this._isRollbackingOnServerValidationError = true;
+        this._isModelPropertySyncDisabled = true;
         model.rollbackAttributes();
-        this._isRollbackingOnServerValidationError = false;
+        this._isModelPropertySyncDisabled = false;
       }
 
       throw new Ember.Object({
@@ -183,7 +183,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
   _modelPropertyDidChange(model, propertyName) {
     Logger.log('Model property did change', propertyName);
-    if (!this._isRollbackingOnServerValidationError && !this._modelPropertiesStagedForUpdate[propertyName]) {
+    if (!this._isModelPropertySyncDisabled && !this._modelPropertiesStagedForUpdate[propertyName]) {
       this._modelPropertiesStagedForUpdate[propertyName] = true;
       run.scheduleOnce('sync', this, this._processStagedModelPropertyUpdates);
     }
@@ -210,19 +210,23 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   _setDirtyModelPropertiesToModel() {
+    this._isModelPropertySyncDisabled = true;
     _.forEach(this.properties, (prop, propName) => {
       if (prop.model && prop.state.isDirty) {
         this.model.set(propName, depromisifyProperty(this.get(propName)));
       }
     });
+    this._isModelPropertySyncDisabled = false;
   },
 
   _syncVirtualPropertiesWithModel() {
+    this._isModelPropertySyncDisabled = true;
     _.forEach(this.properties, (property) => {
       if (property.virtual && property.sync) {
         property.sync.call(this);
       }
     });
+    this._isModelPropertySyncDisabled = false;
   },
 
   _getInitialPropertyValue(propertyName) {
