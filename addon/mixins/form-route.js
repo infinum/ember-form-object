@@ -9,6 +9,7 @@ export default Ember.Mixin.create({
 
   afterModel(model) {
     this._super(...arguments);
+    this.destroyForm();
     this.createForm(model, this.formExtraProps ? this.formExtraProps(model) : null);
   },
 
@@ -40,6 +41,10 @@ export default Ember.Mixin.create({
 
   deactivate() {
     this._super(...arguments);
+    this.destroyForm();
+  },
+
+  destroyForm() {
     if (this.get('form')) {
       this.get('form').destroy();
       this.set('form', null);
