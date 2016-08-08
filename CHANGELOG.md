@@ -1,6 +1,9 @@
+# 0.2.7
+- [BUGFIX] - Fix assigning form to a controller
 - [IMPROVEMENT] - Fix value normalization for dirty comparison (when comparing arrays)
 - [FEATURE] - Add "isSaveError" state
 - [BUGFIX] - Fix when should model properties sync with model
+- [BREAKING] - Rename form state typo "isSubmiting" to "isSubmitting"
 
 # 0.2.6
 - [FEATURE] - Add support for readonly properties that can't be in dirty state
