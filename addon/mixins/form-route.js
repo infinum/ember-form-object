@@ -11,11 +11,12 @@ export default Ember.Mixin.create({
     this._super(...arguments);
     this.destroyForm();
     this.createForm(model, this.formExtraProps ? this.formExtraProps(model) : null);
+    this.assignFormToController(this.controller, this.form);
   },
 
   setupController(controller) {
     this._super(...arguments);
-    controller.set('form', this.get('form'));
+    this.assignFormToController(controller, this.form);
   },
 
   resetController() {
@@ -29,6 +30,12 @@ export default Ember.Mixin.create({
     return new Ember.RSVP.Promise((resolve, reject) => {
       return window.confirm(this.get('formLossConfirmationMessage')) ? resolve() : reject();
     });
+  },
+
+  assignFormToController(controller, form) {
+    if (controller) {
+      controller.set('form', form);
+    }
   },
 
   createForm(model, extraProps) {
