@@ -129,24 +129,24 @@ test('it should call submit (and hooks) if validation passes', function(assert) 
   return this.form.save();
 });
 
-test('it should be in submiting state while running through submit hooks', function(assert) {
+test('it should be in submitting state while running through submit hooks', function(assert) {
   assert.expect(5);
 
   this.form.set('test', 'test');
-  assert.equal(this.form.get('isSubmiting'), false);
+  assert.equal(this.form.get('isSubmitting'), false);
 
   this.form.beforeSubmit = () => {
-    assert.equal(this.form.get('isSubmiting'), true);
+    assert.equal(this.form.get('isSubmitting'), true);
   };
   this.form.submit = () => {
-    assert.equal(this.form.get('isSubmiting'), true);
+    assert.equal(this.form.get('isSubmitting'), true);
     return Ember.RSVP.resolve();
   };
   this.form.afterSubmit = () => {
-    assert.equal(this.form.get('isSubmiting'), true);
+    assert.equal(this.form.get('isSubmitting'), true);
   };
   return this.form.save().then(() => {
-    assert.equal(this.form.get('isSubmiting'), false);
+    assert.equal(this.form.get('isSubmitting'), false);
   });
 });
 
