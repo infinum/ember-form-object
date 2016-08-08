@@ -17,7 +17,7 @@ export default Mixin.create({
     this.validations = _.cloneDeep(this.validations || {});
     this.properties = _.cloneDeep(this.properties || {});
 
-    this.isSubmiting = false;
+    this.isSubmitting = false;
     this.isDirty = false;
     this.isLoaded = false;
     this.isSaveError = false;
@@ -64,7 +64,7 @@ export default Mixin.create({
     }
 
     return this.validate().then(runSafe(this, (result) => {
-      this.set('isSubmiting', true);
+      this.set('isSubmitting', true);
       return this.beforeSubmit(...arguments) || result;
     })).then(runSafe(this, (result) => {
       return this.submit(...arguments) || result;
@@ -76,7 +76,7 @@ export default Mixin.create({
       this.set('isSaveError', true);
       this.handleSaveError(e);
     }).finally(runSafe(this, () => {
-      this.set('isSubmiting', false);
+      this.set('isSubmitting', false);
     }));
   },
 
