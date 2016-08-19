@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Ember from 'ember';
+import { superWasCalled, ensureSuperWasCalled } from 'ember-form-object/utils/super';
 import {
   isThenable, normalizeValueForDirtyComparison, runSafe, getEmberValidationsContainerPolyfill
 } from 'ember-form-object/utils/core';
@@ -10,6 +11,7 @@ const createArray = A;
 export default Mixin.create({
   init(owner, extraProps) {
     assert('Form object should be instantiated with an owner object', !!owner && 'lookup' in owner);
+    superWasCalled(this, 'init');
 
     // ember-validations is still performing module lookup on this.controller so we have to fake it
     this.container = getEmberValidationsContainerPolyfill(owner);
@@ -30,6 +32,7 @@ export default Mixin.create({
   },
 
   onInit: on('init', function() {
+    ensureSuperWasCalled(this, 'init');
     const propertyNames = _.keys(this.properties);
     this._setCalculatedValuesToVirtualProperties(propertyNames);
     this._updateIsLoaded();
@@ -42,9 +45,13 @@ export default Mixin.create({
     this.removeObservers(_.keys(this.properties));
   },
 
-  beforeSubmit() {},
+  beforeSubmit() {
+    superWasCalled(this, 'beforeSubmit');
+  },
 
-  afterSubmit() {},
+  afterSubmit() {
+    superWasCalled(this, 'afterSubmit');
+  },
 
   resetFormAfterSubmit() {
     this._setCalculatedValuesToVirtualProperties(Object.keys(this.properties));
@@ -65,11 +72,15 @@ export default Mixin.create({
 
     return this.validate().then(runSafe(this, (result) => {
       this.set('isSubmitting', true);
-      return this.beforeSubmit(...arguments) || result;
+      const beforeSubmitResult = this.beforeSubmit(...arguments);
+      ensureSuperWasCalled(this, 'beforeSubmit');
+      return beforeSubmitResult || result;
     })).then(runSafe(this, (result) => {
       return this.submit(...arguments) || result;
     })).then(runSafe(this, (result) => {
-      return this.afterSubmit(...arguments) || result;
+      const afterSubmitResult = this.afterSubmit(...arguments);
+      ensureSuperWasCalled(this, 'afterSubmit');
+      return afterSubmitResult || result;
     })).then(runSafe(this, (result) => {
       return this.resetFormAfterSubmit() || result;
     })).catch((e) => {
