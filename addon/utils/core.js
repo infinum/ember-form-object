@@ -1,18 +1,6 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import getOwner from 'ember-getowner-polyfill';
-
-function createForm(formNameOrClass, hostObject, arg1, arg2) {
-  const owner = getOwner(hostObject);
-  let FormClass = formNameOrClass;
-
-  if (typeof formNameOrClass === 'string') {
-    FormClass = owner.resolveRegistration(`form:${formNameOrClass}`);
-    Ember.assert('Form class could not be resolved. Maybe invalid formName param?', !Ember.isEmpty(FormClass));
-  }
-
-  return new FormClass(owner, arg1, arg2);
-}
+import createForm from 'ember-form-object/utils/create-form';
 
 function isEmberPromise(obj) {
   return obj instanceof DS.PromiseObject ||
