@@ -53,8 +53,15 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     this.validate().then(K).catch(K);
   },
 
+  beforeModelSync() {},
+
+  afterModelSync() {},
+
   beforeSubmit() {
+    this._super(...arguments);
+    this.beforeModelSync();
     this.setPropertiesToModel();
+    this.afterModelSync();
   },
 
   resetFormAfterSubmit() {
