@@ -5,6 +5,14 @@ import BaseFormObject from 'ember-form-object/forms/base-form';
 import { createForm } from 'ember-form-object/utils/core';
 import { baseFormObjectClassProps } from '../../stubs/form';
 
+function overrideWithSuper(form, methodName, method) {
+  const oldMethod = form[methodName];
+  form[methodName] = function() {
+    oldMethod.apply(form, arguments);
+    method.apply(form);
+  };
+}
+
 moduleFor('form:base-form', 'Unit | Forms | base form', {
   unit: true,
   needs: [
@@ -112,19 +120,22 @@ test('it should not call submit on save unless validation passes', function(asse
 
 test('it should call submit (and hooks) if validation passes', function(assert) {
   let i = 0;
-  assert.expect(3);
-  this.form.beforeSubmit = function() {
+  overrideWithSuper(this.form, 'beforeSubmit', function() {
     assert.equal(i += 1, 1);
     return Ember.RSVP.resolve();
-  };
+  });
+
   this.form.submit = function() {
     assert.equal(i += 1, 2);
     return Ember.RSVP.resolve();
   };
-  this.form.afterSubmit = function() {
+
+  overrideWithSuper(this.form, 'afterSubmit', function() {
+    this._super(...arguments);
     assert.equal(i += 1, 3);
     return Ember.RSVP.resolve();
-  };
+  });
+
   this.form.set('test', 'test');
   return this.form.save();
 });
@@ -135,16 +146,15 @@ test('it should be in submitting state while running through submit hooks', func
   this.form.set('test', 'test');
   assert.equal(this.form.get('isSubmitting'), false);
 
-  this.form.beforeSubmit = () => {
-    assert.equal(this.form.get('isSubmitting'), true);
-  };
+  overrideWithSuper(this.form, 'beforeSubmit', () => assert.equal(this.form.get('isSubmitting'), true));
+
   this.form.submit = () => {
     assert.equal(this.form.get('isSubmitting'), true);
     return Ember.RSVP.resolve();
   };
-  this.form.afterSubmit = () => {
-    assert.equal(this.form.get('isSubmitting'), true);
-  };
+
+  overrideWithSuper(this.form, 'beforeSubmit', () => assert.equal(this.form.get('isSubmitting'), true));
+
   return this.form.save().then(() => {
     assert.equal(this.form.get('isSubmitting'), false);
   });
@@ -208,7 +218,7 @@ test('it should return validation status of a specific property', function(asser
     newProp2: { value: 'newProp2', validate: { presence: true } },
     newProp3: { value: null, validate: { presence: true } },
     newProp4: { value: 'newProp4', validate: { presence: true } },
-    newProp5: { value: 'newProp5'}
+    newProp5: { value: 'newProp5' }
   });
 
   this.form.set('newProp3', 'newProp3');
