@@ -30,6 +30,7 @@ moduleFor('form:base-form', 'Unit | Forms | base form', {
 
 test('it exists', function(assert) {
   assert.ok(BaseFormObject);
+  assert.ok(this.form);
 });
 
 test('it assigns virtual & extra properties', function(assert) {
@@ -164,7 +165,7 @@ test('it should be in loaded state if has no async properties', function(assert)
   const newFormClassProps = _.cloneDeep(baseFormObjectClassProps);
   delete newFormClassProps.properties.test3.async;
   const NewForm = BaseFormObject.extend(newFormClassProps);
-  this.form = new NewForm(this.container);
+  this.form = createForm(NewForm, this);
   assert.equal(this.form.get('isLoaded'), true);
 });
 
