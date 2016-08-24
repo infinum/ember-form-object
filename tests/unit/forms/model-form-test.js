@@ -1,7 +1,7 @@
 import { moduleFor, test } from 'ember-qunit';
 import Ember from 'ember';
 import ModelFormObject from 'ember-form-object/forms/model-form';
-import { createForm } from 'ember-form-object/utils/core';
+import createForm from 'ember-form-object/utils/create-form';
 import { modelFormObjectClassProps } from '../../stubs/form';
 import { TestModel } from '../../stubs/model';
 

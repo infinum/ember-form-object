@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { moduleFor, test } from 'ember-qunit';
 import Ember from 'ember';
 import BaseFormObject from 'ember-form-object/forms/base-form';
-import { createForm } from 'ember-form-object/utils/core';
+import createForm from 'ember-form-object/utils/create-form';
 import { baseFormObjectClassProps } from '../../stubs/form';
 
 function overrideWithSuper(form, methodName, method) {

@@ -1,6 +1,6 @@
 /* eslint no-alert: 0 */
 import Ember from 'ember';
-import { createForm } from 'ember-form-object/utils/core';
+import createForm from 'ember-form-object/utils/create-form';
 
 export default Ember.Mixin.create({
   _formLossWasConfirmed: false,

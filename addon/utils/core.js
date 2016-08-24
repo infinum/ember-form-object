@@ -1,6 +1,5 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import createForm from 'ember-form-object/utils/create-form';
 
 function isEmberPromise(obj) {
   return obj instanceof DS.PromiseObject ||
@@ -52,7 +51,6 @@ function normalizeValueForDirtyComparison(val, isArray) {
 export {
   isAlive,
   runSafe,
-  createForm,
   isEmberPromise,
   isThenable,
   depromisifyObject,
