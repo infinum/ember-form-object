@@ -1,10 +1,12 @@
-import _ from 'lodash';
 import Ember from 'ember';
 import { superWasCalled, ensureSuperWasCalled } from 'ember-form-object/utils/super';
-import { isThenable, normalizeValueForDirtyComparison, runSafe } from 'ember-form-object/utils/core';
+import { normalizeValueForDirtyComparison, areTwoValuesEqual } from 'ember-form-object/utils/dirty-comparison';
+import {
+  isThenable, runSafe, isFunction, isPlainObject, some, every, result, cloneDeep
+} from 'ember-form-object/utils/core';
 
-const { Mixin, assert, Logger, RSVP, A, on } = Ember;
-const createArray = A;
+const { keys } = Object;
+const { Mixin, assert, Logger, RSVP, A: createArray, on, isArray } = Ember;
 
 export default Mixin.create({
   init(owner, extraProps) {
@@ -18,8 +20,8 @@ export default Mixin.create({
       this.container = owner.ownerInjection().container;
     }
 
-    this.validations = _.cloneDeep(this.validations || {});
-    this.properties = _.cloneDeep(this.properties || {});
+    this.validations = cloneDeep(this.validations || {});
+    this.properties = cloneDeep(this.properties || {});
 
     this.isSubmitting = false;
     this.isDirty = false;
@@ -28,14 +30,16 @@ export default Mixin.create({
 
     this.addProperties(this.properties);
 
-    _.forEach(extraProps, (value, key) => this.set(key, value));
+    if (isPlainObject(extraProps)) {
+      keys(extraProps).forEach((key) => this.set(key, extraProps[key]));
+    }
 
     this._super(...arguments);
   },
 
   onInit: on('init', function() {
     ensureSuperWasCalled(this, 'init');
-    const propertyNames = _.keys(this.properties);
+    const propertyNames = keys(this.properties);
     this._setCalculatedValuesToVirtualProperties(propertyNames);
     this._updateIsLoaded();
     this.addObservers(propertyNames);
@@ -44,7 +48,7 @@ export default Mixin.create({
 
   destroy() {
     this._super(...arguments);
-    this.removeObservers(_.keys(this.properties));
+    this.removeObservers(keys(this.properties));
   },
 
   beforeSubmit() {
@@ -56,7 +60,7 @@ export default Mixin.create({
   },
 
   resetFormAfterSubmit() {
-    this._setCalculatedValuesToVirtualProperties(Object.keys(this.properties));
+    this._setCalculatedValuesToVirtualProperties(keys(this.properties));
 
     // Form can't be dirty after submit
     this.set('isDirty', false);
@@ -72,19 +76,19 @@ export default Mixin.create({
       return RSVP.reject('Form object is not dirty');
     }
 
-    return this.validate().then(runSafe(this, (result) => {
+    return this.validate().then(runSafe(this, (res) => {
       this.set('isSubmitting', true);
       const beforeSubmitResult = this.beforeSubmit(...arguments);
       ensureSuperWasCalled(this, 'beforeSubmit');
-      return beforeSubmitResult || result;
-    })).then(runSafe(this, (result) => {
-      return this.submit(...arguments) || result;
-    })).then(runSafe(this, (result) => {
+      return beforeSubmitResult || res;
+    })).then(runSafe(this, (res) => {
+      return this.submit(...arguments) || res;
+    })).then(runSafe(this, (res) => {
       const afterSubmitResult = this.afterSubmit(...arguments);
       ensureSuperWasCalled(this, 'afterSubmit');
-      return afterSubmitResult || result;
-    })).then(runSafe(this, (result) => {
-      return this.resetFormAfterSubmit() || result;
+      return afterSubmitResult || res;
+    })).then(runSafe(this, (res) => {
+      return this.resetFormAfterSubmit() || res;
     })).catch((e) => {
       this.set('isSaveError', true);
       this.handleSaveError(e);
@@ -99,31 +103,36 @@ export default Mixin.create({
   },
 
   commitState() {
-    _.forEach(this.properties, (property, propertyName) => {
-      property.initialValue = this.get(propertyName);
+    keys(this.properties).forEach((propertyName) => {
+      this.properties[propertyName].initialValue = this.get(propertyName);
       this._setPropertyState(propertyName, 'isDirty', false);
     });
   },
 
   addProperties(properties) {
-    _.forOwn(properties, (initialProp, key) => {
-      this.properties[key] = this._initProperty(initialProp, key);
+    const propertyNames = keys(properties);
+    const validationKeys = [];
+
+    propertyNames.forEach((key) => {
+      this.properties[key] = this._initProperty(properties[key], key);
+
+      if (isPlainObject(this.properties[key].validate)) {
+        validationKeys.push(key);
+      }
     });
 
     if (this._isInitialized) {
-      const propertyNames = _.keys(properties);
       this._setCalculatedValuesToVirtualProperties(propertyNames);
       this._updateIsLoaded();
       this.addObservers(propertyNames);
 
-      const validationKeys = _(properties).map((val, key) => val.validate ? key : null).compact().value();
       this._initDynamicallyAddedValidations(validationKeys);
     }
   },
 
   removeProperties(propertyNames) {
     this.removeObservers(propertyNames);
-    _.forEach(propertyNames, propertyName => this._removeProperty(propertyName));
+    propertyNames.forEach(propertyName => this._removeProperty(propertyName));
   },
 
   isPropertyValid(propertyName) {
@@ -131,11 +140,11 @@ export default Mixin.create({
   },
 
   addObservers(propertyNames) {
-    _.forEach(propertyNames, propertyName => this.addObserver(propertyName, this, this._formPropertyDidChange));
+    propertyNames.forEach(propertyName => this.addObserver(propertyName, this, this._formPropertyDidChange));
   },
 
   removeObservers(propertyNames) {
-    _.forEach(propertyNames, propertyName => this.removeObserver(propertyName, this, this._formPropertyDidChange));
+    propertyNames.forEach(propertyName => this.removeObserver(propertyName, this, this._formPropertyDidChange));
   },
 
   normalizePropertyDefinition(prop) {
@@ -143,17 +152,17 @@ export default Mixin.create({
       virtual: 'virtual' in prop ? !!prop.virtual : true,
       async: 'async' in prop ? !!prop.async : false,
       readonly: 'readonly' in prop ? !!prop.readonly : false,
-      initialValue: 'value' in prop ? _.result(prop, 'value') : null,
+      initialValue: 'value' in prop ? result(prop, 'value') : null,
       validate: prop.validate || null
     };
   },
 
   calculateIsDirty(lastFlag) {
-    return lastFlag === true ? true : _.some(this.properties, prop => prop.state.isDirty);
+    return lastFlag === true ? true : some(this.properties, prop => prop.state.isDirty);
   },
 
   calculateIsLoaded(lastFlag) {
-    return lastFlag === false ? false : _.every(this.properties, prop => prop.state.isLoaded);
+    return lastFlag === false ? false : every(this.properties, prop => prop.state.isLoaded);
   },
 
   _setPropertyState(propertyName, stateName, flag) {
@@ -165,7 +174,7 @@ export default Mixin.create({
   },
 
   _initDynamicallyAddedValidations(validationKeys) {
-    _.forEach(validationKeys, validationKey => {
+    validationKeys.forEach(validationKey => {
       if (this.validations[validationKey].constructor === Object) {
         this.buildRuleValidator(validationKey);
       } else {
@@ -192,10 +201,10 @@ export default Mixin.create({
   },
 
   _setCalculatedValuesToVirtualProperties(propertyNames) {
-    _.forEach(propertyNames, propertyName => {
+    propertyNames.forEach(propertyName => {
       const prop = this.properties[propertyName];
 
-      if (prop && prop.virtual && _.isFunction(prop.set)) {
+      if (prop && prop.virtual && isFunction(prop.set)) {
         prop.initialValue = prop.set.call(this);
         this.set(propertyName, prop.initialValue);
       }
@@ -210,11 +219,11 @@ export default Mixin.create({
   },
 
   _initProperty(initialProp, key) {
-    const prop = this.normalizePropertyDefinition(_.isPlainObject(initialProp) ? initialProp : {});
+    const prop = this.normalizePropertyDefinition(isPlainObject(initialProp) ? initialProp : {});
     prop.state = this._getInitialPropertyState(prop);
 
     if (prop.virtual) {
-      prop.set = (_.isFunction(prop.set) && prop.set) || this[`set${key[0].toUpperCase()}${key.slice(1)}`];
+      prop.set = (isFunction(prop.set) && prop.set) || this[`set${key[0].toUpperCase()}${key.slice(1)}`];
       this[key] = prop.initialValue;
     }
 
@@ -261,9 +270,9 @@ export default Mixin.create({
     const value = this.get(propertyName);
     const initialValue = this._getInitialPropertyValue(propertyName);
     const normalizedValue = normalizeValueForDirtyComparison(value);
-    const normalizedInitialValue = normalizeValueForDirtyComparison(initialValue, Ember.isArray(normalizedValue));
+    const normalizedInitialValue = normalizeValueForDirtyComparison(initialValue, isArray(normalizedValue));
 
-    return !_.isEqual(normalizedValue, normalizedInitialValue);
+    return !areTwoValuesEqual(normalizedValue, normalizedInitialValue);
   },
 
   _updateIsDirty() {

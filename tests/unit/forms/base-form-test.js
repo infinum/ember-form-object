@@ -1,8 +1,8 @@
-import _ from 'lodash';
 import { moduleFor, test } from 'ember-qunit';
 import Ember from 'ember';
 import BaseFormObject from 'ember-form-object/forms/base-form';
 import createForm from 'ember-form-object/utils/create-form';
+import { cloneDeep } from 'ember-form-object/utils/core';
 import { baseFormObjectClassProps } from '../../stubs/form';
 
 function overrideWithSuper(form, methodName, method) {
@@ -162,7 +162,7 @@ test('it should be in submitting state while running through submit hooks', func
 });
 
 test('it should be in loaded state if has no async properties', function(assert) {
-  const newFormClassProps = _.cloneDeep(baseFormObjectClassProps);
+  const newFormClassProps = cloneDeep(baseFormObjectClassProps);
   delete newFormClassProps.properties.test3.async;
   const NewForm = BaseFormObject.extend(newFormClassProps);
   this.form = createForm(NewForm, this);

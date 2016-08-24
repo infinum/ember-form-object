@@ -1,12 +1,13 @@
-import _ from 'lodash';
 import Ember from 'ember';
 import DS from 'ember-data';
 import EmberValidations from 'ember-validations';
 import FormObjectMixin from 'ember-form-object/mixins/form-object';
-import { depromisifyProperty, depromisifyObject, isThenable, runSafe } from 'ember-form-object/utils/core';
+import {
+  depromisifyProperty, depromisifyObject, isThenable, runSafe, isFunction, forOwn
+} from 'ember-form-object/utils/core';
 
-const { ObjectProxy, computed, assert, Logger, run, A, K } = Ember;
-const createArray = A;
+const { keys } = Object;
+const { ObjectProxy, computed, assert, Logger, run, A: createArray, K: noop } = Ember;
 
 export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   isNew: computed.readOnly('model.isNew'),
@@ -50,7 +51,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
         this.get('otherServerErrors').pushObject(validationError);
       }
     });
-    this.validate().then(K).catch(K);
+    this.validate().then(noop).catch(noop);
   },
 
   beforeModelSync() {},
@@ -66,7 +67,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
   resetFormAfterSubmit() {
     // Reset model properties dirty state after submit
-    _.forEach(this.properties, (prop, propName) => {
+    forOwn(this.properties, (prop, propName) => {
       if (prop.model) {
         this.set(`properties.${propName}.state.isDirty`, false);
       }
@@ -100,7 +101,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
   addProperties(properties) {
     const propertiesServerErrors = this.get('propertiesServerErrors');
-    _.keys(properties).forEach(propertyName => {
+    keys(properties).forEach(propertyName => {
       propertiesServerErrors[propertyName] = createArray();
     });
     this._super(...arguments);
@@ -113,7 +114,9 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   syncWithModel() {
-    this.set('content', _.reduce(this.properties, (obj, property, propertyName) => {
+    this.set('content', keys(this.properties).reduce((obj, propertyName) => {
+      const property = this.properties[propertyName];
+
       if (property.model) {
         const modelPropertyValue = this.get(`model.${propertyName}`);
         const formPropertyValue = modelPropertyValue;
@@ -173,7 +176,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     const prop = this._super(...arguments);
 
     if (prop.virtual) {
-      prop.sync = (_.isFunction(prop.sync) && prop.sync) || this[`sync${key[0].toUpperCase()}${key.slice(1)}`];
+      prop.sync = (isFunction(prop.sync) && prop.sync) || this[`sync${key[0].toUpperCase()}${key.slice(1)}`];
     }
 
     return prop;
@@ -197,8 +200,8 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
   _processStagedModelPropertyUpdates() {
     const model = this.get('model');
-    _.forEach(this._modelPropertiesStagedForUpdate, (_val, propertyName) => {
-      this._processStagedModelPropertyUpdate(model, propertyName);
+    keys(this._modelPropertiesStagedForUpdate).forEach((propName) => {
+      this._processStagedModelPropertyUpdate(model, propName);
     });
     this._modelPropertiesStagedForUpdate = {};
   },
@@ -216,7 +219,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
   _setDirtyModelPropertiesToModel() {
     this._isModelPropertySyncDisabled = true;
-    _.forEach(this.properties, (prop, propName) => {
+    forOwn(this.properties, (prop, propName) => {
       if (prop.model && prop.state.isDirty) {
         this.model.set(propName, depromisifyProperty(this.get(propName)));
       }
@@ -226,7 +229,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
 
   _syncVirtualPropertiesWithModel() {
     this._isModelPropertySyncDisabled = true;
-    _.forEach(this.properties, (property) => {
+    forOwn(this.properties, (property) => {
       if (property.virtual && property.sync) {
         property.sync.call(this);
       }

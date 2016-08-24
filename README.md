@@ -129,7 +129,6 @@ export default BaseForm.extend({
 ### TODOs (by priority)
 * Add "isValid" state to each property
 * Example page & docs
-* Remove lodash dependency
 * Better test coverage
 * Remove form-loss feature from route mixin and just add it as an example
 * Add blueprints for ember-cli
