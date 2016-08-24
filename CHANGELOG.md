@@ -1,3 +1,8 @@
+# master
+- [BREAKING] Update ember-validations to 2.0.0-alpha.5 (check their changelog for public API changes)
+- [IMPROVEMENT] It's now mandatory to call this._super() on init, beforeSubmit & afterSubmit methods
+- [IMPROVEMENT] Add beforeModelSync and afterModelSync hooks
+
 # 0.2.7
 - [BUGFIX] - Fix assigning form to a controller
 - [IMPROVEMENT] - Fix value normalization for dirty comparison (when comparing arrays)
