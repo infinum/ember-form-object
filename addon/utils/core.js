@@ -37,13 +37,6 @@ function depromisifyProperty(prop) {
   return prop && prop.toArray ? prop.toArray().map(depromisifyObject) : depromisifyObject(prop);
 }
 
-function getEmberValidationsContainerPolyfill(owner) {
-  return {
-    lookup: module => owner.lookup(module),
-    lookupFactory: module => owner._lookupFactory ? owner._lookupFactory(module) : owner.lookupFactory(module)
-  };
-}
-
 function normalizeValueForDirtyComparison(val, isArray) {
   let normalizedVal = depromisifyProperty(val);
 
@@ -64,6 +57,5 @@ export {
   isThenable,
   depromisifyObject,
   depromisifyProperty,
-  getEmberValidationsContainerPolyfill,
   normalizeValueForDirtyComparison
 };

@@ -1,9 +1,7 @@
 import _ from 'lodash';
 import Ember from 'ember';
 import { superWasCalled, ensureSuperWasCalled } from 'ember-form-object/utils/super';
-import {
-  isThenable, normalizeValueForDirtyComparison, runSafe, getEmberValidationsContainerPolyfill
-} from 'ember-form-object/utils/core';
+import { isThenable, normalizeValueForDirtyComparison, runSafe } from 'ember-form-object/utils/core';
 
 const { Mixin, assert, Logger, RSVP, A, on } = Ember;
 const createArray = A;
@@ -13,8 +11,12 @@ export default Mixin.create({
     assert('Form object should be instantiated with an owner object', !!owner && 'lookup' in owner);
     superWasCalled(this, 'init');
 
-    // ember-validations is still performing module lookup on this.controller so we have to fake it
-    this.container = getEmberValidationsContainerPolyfill(owner);
+    // So ember-validations can load it's stuff
+    if (Ember.setOwner) {
+      Ember.setOwner(this, owner);
+    } else {
+      this.container = owner.ownerInjection().container;
+    }
 
     this.validations = _.cloneDeep(this.validations || {});
     this.properties = _.cloneDeep(this.properties || {});
