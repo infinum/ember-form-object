@@ -1,6 +1,6 @@
 # master
 - [IMPROVEMENT/BREAKING] - Remove lodash dependency (which caused change in dirty comparison algorithm)
-- [BREAKING] createForm is not exported in 'ember-form-object/utils/core' anymore
+- [BREAKING] createForm is not exported in 'ember-form-object/utils/core' anymore but as a default export of 'ember-form-object/utils/create-form' module
 - [BREAKING] Update ember-validations to 2.0.0-alpha.5 (check their changelog for public API changes)
 - [IMPROVEMENT] It's now mandatory to call this._super() on init, beforeSubmit & afterSubmit methods
 - [IMPROVEMENT] Add beforeModelSync and afterModelSync hooks
