@@ -202,6 +202,20 @@ test('it should be in loaded state after async properties resolve through setter
   });
 });
 
+test('it should be in loaded state if async property returns non promise value from setter method', function(assert) {
+  Ember.run(() => this.form.destroy());
+
+  const FormObjectClass = BaseFormObject.extend(baseFormObjectClassProps, {
+    setTest3: () => 'some value'
+  });
+
+  this.form = createForm(FormObjectClass, this, { extraProp: 'extra' });
+
+  assert.equal(this.form.get('test3'), 'some value');
+  assert.equal(this.form.get('properties.test3.state.isLoaded'), true);
+  assert.equal(this.form.get('isLoaded'), true);
+});
+
 test('it should enable adding properties dynamically', function(assert) {
   this.form.addProperties({
     newProp1: { value: 'new1' },

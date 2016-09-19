@@ -5,7 +5,7 @@
 - [FIX/BREAKING] It's now mandatory to call this._super() on init, beforeSubmit & afterSubmit methods
 - [FEATURE] Add beforeModelSync and afterModelSync hooks
 - [FEATURE] Add support for "ordered" option in property definition (#5)
-- [FIX] Fix setting async virtual through class setter method
+- [FIX] Fix setting virtual async property through class setter method
 
 # 0.2.7
 - [FIX] - Fix assigning form to a controller

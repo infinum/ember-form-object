@@ -216,6 +216,7 @@ export default Mixin.create({
         } else {
           prop.initialValue = val;
           this.set(propertyName, prop.initialValue);
+          this._setPropertyState(propertyName, 'isLoaded', true);
         }
       }
     });
