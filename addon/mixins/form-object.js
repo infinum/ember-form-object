@@ -153,7 +153,8 @@ export default Mixin.create({
       async: 'async' in prop ? !!prop.async : false,
       readonly: 'readonly' in prop ? !!prop.readonly : false,
       initialValue: 'value' in prop ? result(prop, 'value') : null,
-      validate: prop.validate || null
+      validate: prop.validate || null,
+      ordered: prop.ordered || false
     };
   },
 
@@ -271,8 +272,13 @@ export default Mixin.create({
     const initialValue = this._getInitialPropertyValue(propertyName);
     const normalizedValue = normalizeValueForDirtyComparison(value);
     const normalizedInitialValue = normalizeValueForDirtyComparison(initialValue, isArray(normalizedValue));
+    const takeOrderIntoAccount = this.properties[propertyName].ordered;
 
-    return !areTwoValuesEqual(normalizedValue, normalizedInitialValue);
+    const opts = {
+      takeOrderIntoAccount
+    };
+
+    return !areTwoValuesEqual(normalizedValue, normalizedInitialValue, opts);
   },
 
   _updateIsDirty() {
