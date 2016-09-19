@@ -174,11 +174,26 @@ test('it shouldn\'t be in loaded state if has async properties', function(assert
 });
 
 test('it should be in loaded state after async properties resolve', function(assert) {
-  const promise = new Ember.RSVP.Promise(function(resolve) {
-    resolve('some value');
-  });
+  const promise = Ember.RSVP.resolve('some value');
   this.form.set('test3', promise);
   assert.equal(this.form.get('isLoaded'), false);
+
+  return promise.finally(() => {
+    assert.equal(this.form.get('test3'), 'some value');
+    assert.equal(this.form.get('properties.test3.state.isLoaded'), true);
+    assert.equal(this.form.get('isLoaded'), true);
+  });
+});
+
+test('it should be in loaded state after async properties resolve through setter method', function(assert) {
+  Ember.run(() => this.form.destroy());
+  const promise = Ember.RSVP.resolve('some value');
+
+  const FormObjectClass = BaseFormObject.extend(baseFormObjectClassProps, {
+    setTest3: () => promise
+  });
+
+  this.form = createForm(FormObjectClass, this, { extraProp: 'extra' });
 
   return promise.finally(() => {
     assert.equal(this.form.get('test3'), 'some value');

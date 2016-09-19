@@ -205,8 +205,17 @@ export default Mixin.create({
       const prop = this.properties[propertyName];
 
       if (prop && prop.virtual && isFunction(prop.set)) {
-        prop.initialValue = prop.set.call(this);
-        this.set(propertyName, prop.initialValue);
+        const val = prop.set.call(this);
+
+        if (isThenable(val)) {
+          val.then(runSafe(this, (resolvedVal) => {
+            prop.initialValue = resolvedVal;
+            this.set(propertyName, prop.initialValue);
+          }));
+        } else {
+          prop.initialValue = val;
+          this.set(propertyName, prop.initialValue);
+        }
       }
     });
   },
