@@ -30,6 +30,13 @@ const baseFormObjectClassProps = {
     },
     'test3': {
       async: true
+    },
+    'testArray': {
+      value: [1, 2, 3]
+    },
+    'orderedTestArray': {
+      value: [1, 2, 3],
+      ordered: true
     }
   },
 

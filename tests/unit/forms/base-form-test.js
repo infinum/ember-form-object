@@ -269,3 +269,36 @@ test('it should enable removing properties dynamically', function(assert) {
   assert.equal(this.form.get('test'), void 0);
   assert.equal('test' in this.form.get('properties'), false);
 });
+
+test('it shouldn\'t be dirty after changing an array with the one with the same elements', function(assert) {
+  assert.equal(this.form.get('isDirty'), false);
+
+  const newArray = [].concat(this.form.get('testArray'));
+  this.form.set('testArray', newArray);
+
+  assert.equal(this.form.get('isDirty'), false);
+});
+
+test('it shouldn\'t be dirty after changing order of elements in an array', function(assert) {
+  assert.equal(this.form.get('isDirty'), false);
+
+  const newArray = [].concat(this.form.get('testArray'));
+  const el1 = newArray[1];
+  newArray[1] = newArray[0];
+  newArray[0] = el1;
+  this.form.set('testArray', newArray);
+
+  assert.equal(this.form.get('isDirty'), false);
+});
+
+test('it should be dirty after changing order of elements in an array if property is set as ordered', function(assert) {
+  assert.equal(this.form.get('isDirty'), false);
+
+  const newArray = [].concat(this.form.get('orderedTestArray'));
+  const el1 = newArray[1];
+  newArray[1] = newArray[0];
+  newArray[0] = el1;
+  this.form.set('orderedTestArray', newArray);
+
+  assert.equal(this.form.get('isDirty'), true);
+});

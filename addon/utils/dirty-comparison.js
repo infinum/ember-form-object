@@ -16,7 +16,9 @@ function normalizeValueForDirtyComparison(val, isValArray) {
   return normalizedVal;
 }
 
-function areTwoValuesEqual(a, b) {
+function areTwoValuesEqual(a, b, opts = {}) {
+  const { takeOrderIntoAccount } = opts;
+
   if (a === b) {
     return true;
   }
@@ -27,7 +29,9 @@ function areTwoValuesEqual(a, b) {
 
   if (isArray(a) && isArray(b) && a.length === b.length) {
     for (let i = 0; i < a.length; i += 1) {
-      if (a[i] !== b[i]) {
+      if (takeOrderIntoAccount && a[i] !== b[i]) {
+        return false;
+      } else if (!takeOrderIntoAccount && b.indexOf(a[i]) === -1) {
         return false;
       }
     }
