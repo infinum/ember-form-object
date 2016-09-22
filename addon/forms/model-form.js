@@ -28,7 +28,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     this._super(container, extraProps);
   },
 
-  rollbackAttributes() {
+  rollbackModelAttributes() {
     this.model.rollbackAttributes();
   },
 

@@ -7,6 +7,7 @@
 - [FEATURE] Add support for "ordered" option in property definition (#5)
 - [FIX] Fix setting virtual async property through class setter method
 - [FEATURE] Add form.reset() API
+- [BREAKING] Rename form.rollbackAttributes() to form.rollbackModelAttributes() for consistency
 
 # 0.2.7
 - [FIX] - Fix assigning form to a controller

@@ -22,7 +22,7 @@ export default Ember.Mixin.create({
   resetController() {
     const model = this.get('controller.form.model');
     if (model && !model.get('isDeleted') && model.get('isNew')) {
-      this.get('controller.form').rollbackAttributes();
+      this.get('controller.form').rollbackModelAttributes();
     }
   },
 
