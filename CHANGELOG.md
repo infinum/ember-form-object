@@ -6,6 +6,7 @@
 - [FEATURE] Add beforeModelSync and afterModelSync hooks
 - [FEATURE] Add support for "ordered" option in property definition (#5)
 - [FIX] Fix setting virtual async property through class setter method
+- [FEATURE] Add form.reset() API
 
 # 0.2.7
 - [FIX] - Fix assigning form to a controller

@@ -316,3 +316,12 @@ test('it should be dirty after changing order of elements in an array if propert
 
   assert.equal(this.form.get('isDirty'), true);
 });
+
+test('it should reset the form', function(assert) {
+  const initialValue = this.form.get('test');
+  this.form.set('test', 'test');
+  this.form.reset();
+  assert.equal(this.form.get('test'), initialValue);
+  assert.equal(this.form.get('isDirty'), false);
+  assert.equal(this.form.get('properties.test.state.isDirty'), false);
+});

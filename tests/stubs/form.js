@@ -40,6 +40,18 @@ const baseFormObjectClassProps = {
     }
   },
 
+  setTest() {
+    return '';
+  },
+
+  setTestArray() {
+    return [1, 2, 3];
+  },
+
+  setOrderedTestArray() {
+    return [1, 2, 3];
+  },
+
   setTest2() {
     return 'pero';
   },

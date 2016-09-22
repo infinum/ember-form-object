@@ -65,6 +65,11 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     this.afterModelSync();
   },
 
+  reset() {
+    this.syncWithModel();
+    this._super(...arguments);
+  },
+
   resetFormAfterSubmit() {
     // Reset model properties dirty state after submit
     forOwn(this.properties, (prop, propName) => {

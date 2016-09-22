@@ -59,6 +59,10 @@ export default Mixin.create({
     superWasCalled(this, 'afterSubmit');
   },
 
+  reset() {
+    return this.resetFormAfterSubmit();
+  },
+
   resetFormAfterSubmit() {
     this._setCalculatedValuesToVirtualProperties(keys(this.properties));
 

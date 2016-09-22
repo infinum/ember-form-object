@@ -188,3 +188,14 @@ test('it should detect model property conflicts', function(assert) {
   this.form.set('modelProp1', '2');
   Ember.run(() => this.model.set('modelProp1', '3'));
 });
+
+test('it should reset the form', function(assert) {
+  const modelProp1initial = this.form.get('modelProp1');
+  const virtualProp1initial = this.form.get('virtualProp1');
+  this.form.set('modelProp1', 'modelProp1 new val');
+  this.form.set('virtualProp1', 'virtualProp1 new val');
+  this.form.reset();
+  assert.equal(this.form.get('modelProp1'), modelProp1initial);
+  assert.equal(this.form.get('virtualProp1'), virtualProp1initial);
+  assert.equal(this.form.get('isDirty'), false);
+});
