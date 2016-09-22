@@ -40,6 +40,10 @@ const baseFormObjectClassProps = {
     }
   },
 
+  setTest3() {
+    return new Ember.RSVP.Promise(function() {});
+  },
+
   setTest() {
     return '';
   },

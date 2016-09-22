@@ -208,9 +208,10 @@ export default Mixin.create({
   _setCalculatedValuesToVirtualProperties(propertyNames) {
     propertyNames.forEach(propertyName => {
       const prop = this.properties[propertyName];
+      const hasPropSet = isFunction(prop.set);
 
-      if (prop && prop.virtual && isFunction(prop.set)) {
-        const val = prop.set.call(this);
+      if (prop && prop.virtual) {
+        const val = hasPropSet ? prop.set.call(this) : prop.initialValue;
 
         if (isThenable(val)) {
           val.then(runSafe(this, (resolvedVal) => {
