@@ -1,3 +1,5 @@
+- [FIX] Setting calculated values only to writeable (!readonly) virtual properties
+
 # 0.2.8
 - [FIX/BREAKING] - Remove lodash dependency (which caused change in dirty comparison algorithm)
 - [BREAKING] createForm is not exported in 'ember-form-object/utils/core' anymore but as a default export of 'ember-form-object/utils/create-form' module
