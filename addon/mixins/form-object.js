@@ -210,7 +210,7 @@ export default Mixin.create({
       const prop = this.properties[propertyName];
       const hasPropSet = isFunction(prop.set);
 
-      if (prop && prop.virtual) {
+      if (prop && prop.virtual && !prop.readonly) {
         const val = hasPropSet ? prop.set.call(this) : prop.initialValue;
 
         if (isThenable(val)) {
