@@ -24,7 +24,7 @@ function isFunction(x) {
 }
 
 function isPlainObject(x) {
-  return typeof x === 'object' && x !== null && !x.prototype;
+  return typeof x === 'object' && x !== null && !x.prototype && !(x instanceof Date);
 }
 
 function runSafe(unsafeObject, clb, clbContext, fallbackReturnValue) {
