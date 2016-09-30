@@ -1,4 +1,5 @@
 - [FIX] Setting calculated values only to writeable (!readonly) virtual properties
+- [FIX] Fixed dirty detection of date properties
 
 # 0.2.8
 - [FIX/BREAKING] - Remove lodash dependency (which caused change in dirty comparison algorithm)
