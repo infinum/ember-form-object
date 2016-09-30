@@ -10,7 +10,7 @@ export default Base.extend({
 
   call: function() {
     const value = this.model.get(`${this.property}`);
-    const propertyServerErrors = this.model.get(`propertiesServerErrors.${this.property}`);
+    const propertyServerErrors = this.model.get('propertiesServerErrors')[this.property];
     propertyServerErrors.forEach(propertyServerError => {
       if (propertyServerError.value === value) {
         this.errors.pushObject(propertyServerError.message);
