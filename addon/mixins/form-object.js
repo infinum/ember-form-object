@@ -69,6 +69,7 @@ export default Mixin.create({
     // Form can't be dirty after submit
     this.set('isDirty', false);
     this.set('isSaveError', false);
+    this.set('saveError', null);
   },
 
   submit() {
@@ -95,6 +96,7 @@ export default Mixin.create({
       return this.resetFormAfterSubmit() || res;
     })).catch((e) => {
       this.set('isSaveError', true);
+      this.set('saveError', e);
       this.handleSaveError(e);
     }).finally(runSafe(this, () => {
       this.set('isSubmitting', false);
