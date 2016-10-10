@@ -13,6 +13,7 @@ export default Mixin.create({
   isDirty: false,
   isLoaded: false,
   isSaveError: false,
+  allowSaveIfNotDirty: false,
   _isInitialized: false,
 
   init(owner, extraProps) {
@@ -78,7 +79,7 @@ export default Mixin.create({
   },
 
   save() {
-    if (!this.get('isDirty')) {
+    if (!this.get('isDirty') && !this.get('allowSaveIfNotDirty')) {
       return RSVP.reject('Form object is not dirty');
     }
 
