@@ -145,14 +145,6 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     }, {}));
   },
 
-  destroy() {
-    const model = this.get('model');
-    if (model.get('isNew')) {
-      model.deleteRecord();
-    }
-    this._super(...arguments);
-  },
-
   modelPropertyConflictDidOccur(model, propertyName) {
     Logger.debug(`ModelFormObject: Model property "${propertyName}" did change while form was dirty`);
   },

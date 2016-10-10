@@ -2,6 +2,7 @@
 - [FIX] Fixed dirty detection of date properties
 - [FEATURE] Set saveError object to form so it can be used to display error messages
 - [FEATURE] Add allowSaveIfNotDirty config
+- [BREAKING] Remove deleting isNew models in model form destroy hook
 
 # 0.2.8
 - [FIX/BREAKING] - Remove lodash dependency (which caused change in dirty comparison algorithm)
