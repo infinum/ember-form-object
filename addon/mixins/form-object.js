@@ -9,6 +9,12 @@ const { keys } = Object;
 const { Mixin, assert, Logger, RSVP, A: createArray, on, isArray } = Ember;
 
 export default Mixin.create({
+  isSubmitting: false,
+  isDirty: false,
+  isLoaded: false,
+  isSaveError: false,
+  _isInitialized: false,
+
   init(owner, extraProps) {
     assert('Form object should be instantiated with an owner object', !!owner && 'lookup' in owner);
     superWasCalled(this, 'init');
@@ -22,11 +28,6 @@ export default Mixin.create({
 
     this.validations = cloneDeep(this.validations || {});
     this.properties = cloneDeep(this.properties || {});
-
-    this.isSubmitting = false;
-    this.isDirty = false;
-    this.isLoaded = false;
-    this.isSaveError = false;
 
     this.addProperties(this.properties);
 
