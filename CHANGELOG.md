@@ -1,3 +1,4 @@
+# 0.2.9
 - [FIX] Setting calculated values only to writeable (!readonly) virtual properties
 - [FIX] Fixed dirty detection of date properties
 - [FEATURE] Set saveError object to form so it can be used to display error messages
