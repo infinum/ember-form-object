@@ -1,3 +1,5 @@
+- [FEATURE] Add form-loss-preventer service and use it on route mixin to enable multiple form loss preventions on one route
+
 # 0.2.9
 - [FIX] Setting calculated values only to writeable (!readonly) virtual properties
 - [FIX] Fixed dirty detection of date properties
