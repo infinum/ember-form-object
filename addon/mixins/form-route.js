@@ -84,10 +84,6 @@ export default Mixin.create({
 
   actions: {
     willTransition(transition) {
-      const form = this.get('controller.form');
-
-      assert('"form" has to be set on controller when using FormRouteMixin', !isEmpty(form));
-
       if (this.shouldPreventTransition()) {
         transition.abort();
         this.confirmTransition().then(() => {
