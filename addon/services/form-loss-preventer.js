@@ -24,7 +24,7 @@ export default Service.extend({
   },
 
   hasSomeDirtyForms() {
-    return some(this.get('registeredFormObjects').map((formObject) => formObject.get('isDirty')));
+    return some(this.get('registeredFormObjects'), (formObject) => formObject.get('isDirty'));
   },
 
   onWindowBeforeUnload() {
