@@ -2,7 +2,7 @@
 import Ember from 'ember';
 import createForm from 'ember-form-object/utils/create-form';
 
-const {Mixin, inject: { service }, set, RSVP: { Promise }, assert, isEmpty} = Ember;
+const {Mixin, inject: { service }, RSVP: { Promise }, assert, isEmpty} = Ember;
 
 export default Mixin.create({
   formLossPreventer: service('form-loss-preventer'),
@@ -15,7 +15,6 @@ export default Mixin.create({
     this._super(...arguments);
     this.destroyForm();
     this.createForm(model, this.formExtraProps ? this.formExtraProps(model) : null);
-    set(this, 'controller.form', this.get('form'), true);
   },
 
   setupController(controller) {
