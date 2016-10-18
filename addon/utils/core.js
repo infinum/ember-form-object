@@ -2,7 +2,7 @@ import Ember from 'ember';
 import DS from 'ember-data';
 
 const { keys: objectKeys } = Object;
-const { copy } = Ember;
+const { copy, isArray } = Ember;
 
 function isEmberPromise(obj) {
   return obj instanceof DS.PromiseObject ||
@@ -48,10 +48,11 @@ function depromisifyProperty(prop) {
 }
 
 function some(obj, clb) {
-  const keys = objectKeys(obj);
+  const isObjArray = isArray(obj);
+  const keys = isObjArray ? obj : objectKeys(obj);
 
   for (let i = 0; i < keys.length; i += 1) {
-    if (clb(obj[keys[i]])) {
+    if (clb(isObjArray ? obj[i] : obj[keys[i]])) {
       return true;
     }
   }
