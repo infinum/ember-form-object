@@ -2,7 +2,11 @@
 import Ember from 'ember';
 import createForm from 'ember-form-object/utils/create-form';
 
-export default Ember.Mixin.create({
+const {Mixin, inject: { service }, set, RSVP: { Promise }, assert, isEmpty} = Ember;
+
+export default Mixin.create({
+  formLossPreventer: service('form-loss-preventer'),
+
   _formLossWasConfirmed: false,
   preventFormLoss: true,
   formLossConfirmationMessage: 'Are you sure?',
@@ -11,12 +15,12 @@ export default Ember.Mixin.create({
     this._super(...arguments);
     this.destroyForm();
     this.createForm(model, this.formExtraProps ? this.formExtraProps(model) : null);
-    this.assignFormToController(this.controller, this.form);
+    set(this, 'controller.form', this.get('form'), true);
   },
 
   setupController(controller) {
     this._super(...arguments);
-    this.assignFormToController(controller, this.form);
+    controller.set('form', this.get('form'));
   },
 
   resetController() {
@@ -27,15 +31,9 @@ export default Ember.Mixin.create({
   },
 
   confirmTransition() {
-    return new Ember.RSVP.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       return window.confirm(this.get('formLossConfirmationMessage')) ? resolve() : reject();
     });
-  },
-
-  assignFormToController(controller, form) {
-    if (controller) {
-      controller.set('form', form);
-    }
   },
 
   createForm(model, extraProps) {
@@ -43,6 +41,11 @@ export default Ember.Mixin.create({
     const args = [formName, this].concat(model ? [model, extraProps] : [extraProps]);
     const form = createForm(...args);
     this.set('form', form);
+
+    if (this.get('preventFormLoss')) {
+      this.get('formLossPreventer').registerFormObject(form);
+    }
+
     return form;
   },
 
@@ -52,19 +55,27 @@ export default Ember.Mixin.create({
   },
 
   destroyForm() {
-    if (this.get('form')) {
-      this.get('form').destroy();
+    const form = this.get('form');
+    if (form) {
+      if (this.get('preventFormLoss')) {
+        this.get('formLossPreventer').unregisterFormObject(form);
+      }
+      form.destroy();
       this.set('form', null);
     }
+  },
+
+  shouldPreventTransition() {
+    return this.get('preventFormLoss') && this.get('formLossPreventer').hasSomeDirtyForms() && !this._formLossWasConfirmed;
   },
 
   actions: {
     willTransition(transition) {
       const form = this.get('controller.form');
 
-      Ember.assert('"form" has to be set on controller when using FormRouteMixin', !Ember.isEmpty(form));
+      assert('"form" has to be set on controller when using FormRouteMixin', !isEmpty(form));
 
-      if (this.get('preventFormLoss') && form.get('isDirty') && !this._formLossWasConfirmed) {
+      if (this.shouldPreventTransition()) {
         transition.abort();
         this.confirmTransition().then(() => {
           this._formLossWasConfirmed = true;
