@@ -15,6 +15,7 @@ export default Mixin.create({
   isSaveError: false,
   allowSaveIfNotDirty: false,
   _isInitialized: false,
+  preventFormLoss: true,
 
   init(owner, extraProps) {
     assert('Form object should be instantiated with an owner object', !!owner && 'lookup' in owner);

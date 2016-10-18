@@ -2,19 +2,28 @@
 import Ember from 'ember';
 import createForm from 'ember-form-object/utils/create-form';
 
-const {Mixin, inject: { service }, RSVP: { Promise }, assert, isEmpty} = Ember;
+const {Mixin, inject: { service }, RSVP: { Promise }, assert, isEmpty, A: emberArray} = Ember;
 
 export default Mixin.create({
   formLossPreventer: service('form-loss-preventer'),
 
   _formLossWasConfirmed: false,
+  _forms: null,
   preventFormLoss: true,
   formLossConfirmationMessage: 'Are you sure?',
+  formName: null, // Set this to have form automatically created in afterModel and set to controller.form
+
+  init() {
+    this._super(...arguments);
+    this._forms = emberArray();
+  },
 
   afterModel(model) {
     this._super(...arguments);
-    this.destroyForm();
-    this.createForm(model, this.formExtraProps ? this.formExtraProps(model) : null);
+
+    if (this.get('formName')) {
+      this.createAndSetupMainForm(model);
+    }
   },
 
   setupController(controller) {
@@ -28,13 +37,18 @@ export default Mixin.create({
     });
   },
 
-  createForm(model, extraProps) {
-    const formName = this.get('formName');
-    const args = [formName, this].concat(model ? [model, extraProps] : [extraProps]);
-    const form = createForm(...args);
+  createAndSetupMainForm(model) {
+    this.destroyForms();
+    const form = this.createForm(this.get('formName'), model, this.formExtraProps ? this.formExtraProps(model) : null);
     this.set('form', form);
+  },
 
-    if (this.get('preventFormLoss')) {
+  createForm(formName, model, extraProps) {
+    const formArgs = model ? [model, extraProps] : [extraProps];
+    const form = createForm(formName, this, ...formArgs);
+    this._forms.push(form);
+
+    if (form.get('preventFormLoss')) {
       this.get('formLossPreventer').registerFormObject(form);
     }
 
@@ -43,18 +57,25 @@ export default Mixin.create({
 
   deactivate() {
     this._super(...arguments);
-    this.destroyForm();
+    this.destroyForms();
   },
 
-  destroyForm() {
-    const form = this.get('form');
-    if (form) {
-      if (this.get('preventFormLoss')) {
-        this.get('formLossPreventer').unregisterFormObject(form);
-      }
-      form.destroy();
+  destroyForms() {
+    this._forms.forEach((form) => this.destroyForm(form));
+
+    if (this.get('formName')) {
       this.set('form', null);
     }
+  },
+
+  destroyForm(form) {
+    this._forms = this._forms.without(form);
+
+    if (form.get('preventFormLoss')) {
+      this.get('formLossPreventer').unregisterFormObject(form);
+    }
+
+    form.destroy();
   },
 
   shouldPreventTransition() {
