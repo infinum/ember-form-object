@@ -16,7 +16,7 @@ export default Service.extend({
   },
 
   registerFormObject(formObject) {
-    this.set('registeredFormObjects', this.get('registeredFormObjects').concat(formObject));
+    this.set('registeredFormObjects', emberArray(this.get('registeredFormObjects').concat(formObject)));
   },
 
   unregisterFormObject(formObject) {
