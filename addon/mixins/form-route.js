@@ -22,13 +22,6 @@ export default Mixin.create({
     controller.set('form', this.get('form'));
   },
 
-  resetController() {
-    const model = this.get('controller.form.model');
-    if (model && !model.get('isDeleted') && model.get('isNew')) {
-      this.get('controller.form').rollbackModelAttributes();
-    }
-  },
-
   confirmTransition() {
     return new Promise((resolve, reject) => {
       return window.confirm(this.get('formLossConfirmationMessage')) ? resolve() : reject();
