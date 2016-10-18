@@ -1,4 +1,5 @@
 - [FEATURE] Add form-loss-preventer service and use it on route mixin to enable multiple form loss preventions on one route
+- [FIX/BREAKING] Remove resetController handler in route mixin
 
 # 0.2.9
 - [FIX] Setting calculated values only to writeable (!readonly) virtual properties
