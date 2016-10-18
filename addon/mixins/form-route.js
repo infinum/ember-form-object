@@ -2,7 +2,7 @@
 import Ember from 'ember';
 import createForm from 'ember-form-object/utils/create-form';
 
-const {Mixin, inject: { service }, RSVP: { Promise }, assert, isEmpty, A: emberArray} = Ember;
+const {Mixin, inject: { service }, RSVP: { Promise }, A: emberArray} = Ember;
 
 export default Mixin.create({
   formLossPreventer: service('form-loss-preventer'),
