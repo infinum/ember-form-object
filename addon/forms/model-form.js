@@ -48,8 +48,8 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   // Default is JSON API errors spec
-  hasErrorsInResponse(response) {
-    return response && response.errors && response.errors.length;
+  hasValidationErrorsInResponse(response) {
+    return response && response.errors && response.errors.length && createArray(response.errors).findBy('status', '422');
   },
 
   handleServerValidationErrors(response) {
@@ -101,7 +101,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   },
 
   handleSubmitErrorResponse(response, model) {
-    const isServerValidationError = response.isAdapterError && this.hasErrorsInResponse(response);
+    const isServerValidationError = response.isAdapterError && this.hasValidationErrorsInResponse(response);
 
     if (isServerValidationError) {
       this.handleServerValidationErrors(response);
