@@ -128,6 +128,7 @@ export default BaseForm.extend({
 
 ### TODOs (by priority)
 * Add "isValid" state to each property
+* Move server validation error logic to base form object
 * Example page & docs
 * Better test coverage
 * Remove form-loss feature from route mixin and just add it as an example

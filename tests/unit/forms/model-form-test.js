@@ -5,10 +5,23 @@ import createForm from 'ember-form-object/utils/create-form';
 import { modelFormObjectClassProps } from '../../stubs/form';
 import { TestModel } from '../../stubs/model';
 
+const { String: { underscore }} = Ember;
+
 function setServerValidationErrors(model, errors) {
   model.save = function() {
     model.set('errors', { content: errors, length: errors.length });
-    return Ember.RSVP.reject({ isAdapterError: true, message: '422 Unprocessible entity' });
+
+    const jsonAPIerrors = errors.map((err) => {
+      return {
+        status: '422',
+        detail: err.message,
+        source: {
+          pointer: `data/attributes/${underscore(err.attribute)}`
+        }
+      }
+    });
+
+    return Ember.RSVP.reject({ isAdapterError: true, message: '422 Unprocessible entity', errors: jsonAPIerrors});
   };
 }
 

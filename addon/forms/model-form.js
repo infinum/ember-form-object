@@ -7,10 +7,10 @@ import {
 } from 'ember-form-object/utils/core';
 
 const { keys } = Object;
-const { ObjectProxy, computed, assert, Logger, run, A: createArray, K: noop } = Ember;
+const { ObjectProxy, computed, computed: { readOnly }, assert, Logger, run, A: createArray, K: noop, String: { camelize } } = Ember;
 
 export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
-  isNew: computed.readOnly('model.isNew'),
+  isNew: readOnly('model.isNew'),
 
   propertiesServerErrors: computed(function() {
     return {};
@@ -37,8 +37,23 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     this._syncVirtualPropertiesWithModel();
   },
 
-  handleServerValidationErrors() {
-    this.get('model.errors.content').forEach(err => {
+  // Default is JSON API errors spec
+  getErrorsFromResponse(response) {
+    return response.errors.map(err => {
+      const pointerSplit = err.source.pointer.split('/');
+      const attribute = camelize(pointerSplit[pointerSplit.length - 1]);
+      const message = err.detail;
+      return { attribute, message };
+    });
+  },
+
+  // Default is JSON API errors spec
+  hasErrorsInResponse(response) {
+    return response && response.errors && response.errors.length;
+  },
+
+  handleServerValidationErrors(response) {
+    this.getErrorsFromResponse(response).forEach(err => {
       const propertyName = err.attribute;
       const value = this.get(propertyName);
       const validationError = {
@@ -81,26 +96,34 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
     return this._super(...arguments);
   },
 
+  submitModel(model) {
+    return model.save();
+  },
+
+  handleSubmitErrorResponse(response, model) {
+    const isServerValidationError = response.isAdapterError && this.hasErrorsInResponse(response);
+
+    if (isServerValidationError) {
+      this.handleServerValidationErrors(response);
+    }
+
+    if (!model.get('isNew')) {
+      this._isModelPropertySyncDisabled = true;
+      model.rollbackAttributes();
+      this._isModelPropertySyncDisabled = false;
+    }
+
+    throw new Ember.Object({
+      isServerValidationError,
+      response,
+      name: isServerValidationError ? 'Server validation error' : 'Error'
+    });
+  },
+
   submit() {
     const model = this.get('model');
-    return model.save().catch((response) => {
-      const isServerValidationError = response.isAdapterError && model.get('errors.length') > 0;
-
-      if (isServerValidationError) {
-        this.handleServerValidationErrors();
-      }
-
-      if (!model.get('isNew')) {
-        this._isModelPropertySyncDisabled = true;
-        model.rollbackAttributes();
-        this._isModelPropertySyncDisabled = false;
-      }
-
-      throw new Ember.Object({
-        isServerValidationError,
-        response,
-        name: isServerValidationError ? 'Server validation error' : 'Error'
-      });
+    return this.submitModel(model).catch((response) => {
+     return this.handleSubmitErrorResponse(response, model);
     });
   },
 

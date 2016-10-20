@@ -1,3 +1,5 @@
+- [FIX] Fix server validation error handling to be extracted from response, not model.errors
+
 # 0.2.10
 - [FEATURE] Add form-loss-preventer service and use it on route mixin to enable multiple form loss preventions on one route
 - [FIX/BREAKING] Remove resetController handler in route mixin
