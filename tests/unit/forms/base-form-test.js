@@ -72,10 +72,10 @@ test('it should not start validations on save unless is dirty', function(assert)
 
 test('it should be in "isSaveError" state if save fails', function(assert) {
   this.form.submit = function() {
-    assert.notOk(true, 'submit should not have been called');
+    throw Ember.Object.create({isAdapterError: true});
   };
 
-  this.form.set('test2', '');
+  this.form.set('test2', 'asd');
 
   return this.form.save().then(() => {
     assert.notOk(true, 'save should not have been resolved');

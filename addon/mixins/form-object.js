@@ -6,7 +6,7 @@ import {
 } from 'ember-form-object/utils/core';
 
 const { keys } = Object;
-const { Mixin, assert, Logger, RSVP, A: createArray, on, isArray } = Ember;
+const { Mixin, assert, Logger, RSVP, RSVP: { Promise }, A: createArray, on, isArray } = Ember;
 
 export default Mixin.create({
   isSubmitting: false,
@@ -84,31 +84,38 @@ export default Mixin.create({
       return RSVP.reject('Form object is not dirty');
     }
 
-    return this.validate().then(runSafe(this, (res) => {
-      this.set('isSubmitting', true);
-      const beforeSubmitResult = this.beforeSubmit(...arguments);
-      ensureSuperWasCalled(this, 'beforeSubmit');
-      return beforeSubmitResult || res;
-    })).then(runSafe(this, (res) => {
-      return this.submit(...arguments) || res;
-    })).then(runSafe(this, (res) => {
-      const afterSubmitResult = this.afterSubmit(...arguments);
-      ensureSuperWasCalled(this, 'afterSubmit');
-      return afterSubmitResult || res;
-    })).then(runSafe(this, (res) => {
-      return this.resetFormAfterSubmit() || res;
-    })).catch((e) => {
-      this.set('isSaveError', true);
-      this.set('saveError', e);
-      this.handleSaveError(e);
-    }).finally(runSafe(this, () => {
-      this.set('isSubmitting', false);
-    }));
+    return new Promise((resolve, reject) => {
+      this.validate().then(runSafe(this, (res) => {
+        this.set('isSubmitting', true);
+        const beforeSubmitResult = this.beforeSubmit(...arguments);
+        ensureSuperWasCalled(this, 'beforeSubmit');
+        return beforeSubmitResult || res;
+      })).then(runSafe(this, (res) => {
+        return this.submit(...arguments) || res;
+      })).then(runSafe(this, (res) => {
+        const afterSubmitResult = this.afterSubmit(...arguments);
+        ensureSuperWasCalled(this, 'afterSubmit');
+        return afterSubmitResult || res;
+      })).then(runSafe(this, (res) => {
+        return this.resetFormAfterSubmit() || res;
+      })).catch((e) => {
+        this.set('isSaveError', true);
+        this.set('saveError', e);
+        this.handleSaveError(e);
+        reject(e);
+      }).finally(runSafe(this, () => {
+        this.set('isSubmitting', false);
+      })).then(resolve);
+    });
   },
 
   handleSaveError(err) {
     Logger.warn(err);
-    throw err;
+
+    // We want all "real" errors to fall through
+    if (err instanceof Error) {
+      throw err;
+    }
   },
 
   commitState() {
