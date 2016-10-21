@@ -17,9 +17,10 @@ function serverResponseError(res) {
 }
 
 function catchServerResponseError(err) {
-  if (!err.isAdapterError) {
-    throw err;
+  if (err.isAdapterError) {
+    return err;
   }
+  throw err;
 }
 
 export {
