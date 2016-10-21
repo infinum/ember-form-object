@@ -5,6 +5,7 @@ import FormObjectMixin from 'ember-form-object/mixins/form-object';
 import {
   depromisifyProperty, depromisifyObject, isThenable, runSafe, isFunction, forOwn
 } from 'ember-form-object/utils/core';
+import { serverResponseError } from 'ember-form-object/utils/errors';
 
 const { keys } = Object;
 const { ObjectProxy, computed, computed: { readOnly }, assert, Logger, run, A: createArray, K: noop, String: { camelize } } = Ember;
@@ -113,11 +114,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
       this._isModelPropertySyncDisabled = false;
     }
 
-    throw new Ember.Object({
-      isServerValidationError,
-      response,
-      name: isServerValidationError ? 'Server validation error' : 'Error'
-    });
+    throw serverResponseError(response);
   },
 
   submit() {
