@@ -38,9 +38,12 @@ export default Mixin.create({
   },
 
   createAndSetupMainForm(model) {
-    this.destroyForms();
-    const form = this.createForm(this.get('formName'), model, this.formExtraProps ? this.formExtraProps(model) : null);
-    this.set('form', form);
+    const controllerForm = this.get('controller.form');
+    if (!controllerForm || controllerForm.get('model') !== model) {
+      this.destroyForms();
+      const form = this.createForm(this.get('formName'), model, this.formExtraProps ? this.formExtraProps(model) : null);
+      this.set('form', form);
+    }
   },
 
   createForm(formName, model, extraProps) {
