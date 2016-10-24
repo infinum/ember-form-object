@@ -17,7 +17,7 @@ function serverResponseError(res) {
 }
 
 function catchServerResponseError(err) {
-  if (err.isAdapterError) {
+  if (err && err.isAdapterError) {
     return err;
   }
   throw err;
