@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import {every} from 'ember-form-object/utils/core';
 
 const {Object: EmberObject} = Ember;
 
@@ -23,7 +24,15 @@ function catchServerResponseError(err) {
   throw err;
 }
 
+function catchServerValidationError(err) {
+  if (err && err.isAdapterError && every(err.errors, (e) => e.status === '422')) {
+    return err;
+  }
+  throw err;
+}
+
 export {
   serverResponseError,
-  catchServerResponseError
+  catchServerResponseError,
+  catchServerValidationError
 }
