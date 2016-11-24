@@ -1,3 +1,4 @@
+# 0.2.11
 - [FIX] Fix server validation error handling to be extracted from response, not model.errors
 - [FIX/BREAKING] Fix handling save errors and promise rejections
 
