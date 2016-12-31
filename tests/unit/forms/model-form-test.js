@@ -146,7 +146,7 @@ test('it should rollback model attributes on server validation errors only on pe
 
   return this.form.save().then(() => {
     assert.notOk(true, 'Save should not have been resolved');
-  }).catch(Ember.K);
+  }).catch(function() {});
 });
 
 test('it should handle server validation errors for attributes not in form properties', function(assert) {

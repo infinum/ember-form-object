@@ -8,7 +8,16 @@ import {
 import { serverResponseError } from 'ember-form-object/utils/errors';
 
 const { keys } = Object;
-const { ObjectProxy, computed, computed: { readOnly }, assert, Logger, run, A: createArray, K: noop, String: { camelize } } = Ember;
+const {
+  ObjectProxy,
+  computed,
+  computed: { readOnly },
+  assert,
+  Logger,
+  run,
+  A: createArray,
+  String: { camelize }
+} = Ember;
 
 export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
   isNew: readOnly('model.isNew'),
@@ -67,7 +76,7 @@ export default ObjectProxy.extend(EmberValidations, FormObjectMixin, {
         this.get('otherServerErrors').pushObject(validationError);
       }
     });
-    this.validate().then(noop).catch(noop);
+    this.validate().then(function() {}).catch(function() {});
   },
 
   beforeModelSync() {},
